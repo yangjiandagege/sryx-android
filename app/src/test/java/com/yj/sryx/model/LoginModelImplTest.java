@@ -1,5 +1,7 @@
 package com.yj.sryx.model;
 
+import com.yj.sryx.utils.LogUtils;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -31,6 +33,7 @@ public class LoginModelImplTest {
                 , "op1eTwiRFiCEpEm0ZtZMIlHWd0jw", new BeanCallback<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        LogUtils.logout("success");
                         assertEquals(true, true);
                     }
 

@@ -3,7 +3,7 @@ package com.yj.sryx.model.beans;
 import java.io.Serializable;
 
 /**
- * Created by acce-17 on 2017/7/9.
+ * Created by eason.yang on 2017/7/9.
  */
 
 public class WxUser implements Serializable {
