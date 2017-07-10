@@ -43,7 +43,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void init() {
-        LoginModelImpl model = new LoginModelImpl();
+        LoginModelImpl model = new LoginModelImpl(this);
         if (model.isAlreadyLogin()) {
             SryxApp.sWxUser = LocalUserManager.unSerializeUser(this);
             jumpMainView();

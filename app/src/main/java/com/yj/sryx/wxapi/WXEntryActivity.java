@@ -16,7 +16,7 @@ import com.yj.sryx.activity.MainActivity;
 import com.yj.sryx.activity.SplashActivity;
 import com.yj.sryx.model.LoginModel;
 import com.yj.sryx.model.LoginModelImpl;
-import com.yj.sryx.model.BeanCallback;
+import com.yj.sryx.manager.httpRequest.BeanCallback;
 import com.yj.sryx.manager.ActivityStackManager;
 import com.yj.sryx.utils.LogUtils;
 
@@ -30,7 +30,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = this;
-        mLoginModel = new LoginModelImpl();
+        mLoginModel = new LoginModelImpl(this);
         sWxApi.handleIntent(this.getIntent(), this);
     }
 

@@ -1,5 +1,7 @@
 package com.yj.sryx.model;
 
+import com.yj.sryx.manager.httpRequest.BeanCallback;
+
 /**
  * Created by eason.yang on 2017/7/9.
  */
