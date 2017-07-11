@@ -15,7 +15,8 @@ public class SryxApp extends Application {
     public static Context sContext;
     public static IWXAPI sWxApi;
     public static WxUser sWxUser;
-
+    public static        int                   currentThemeId   = 0;
+    public static        int                   toolbarTextColor = 0;
     @Override
     public void onCreate() {
         super.onCreate();

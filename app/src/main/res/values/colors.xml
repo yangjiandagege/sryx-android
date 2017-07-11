@@ -1,10 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">@color/theme_yellow_background</color>
+    <color name="colorPrimaryDark">@color/theme_yellow_background</color>
     <color name="colorAccent">#FF4081</color>
 
     <color name="color_white">@android:color/white</color>
+
+    <color name="text_light">@android:color/white</color>
+    <color name="text_dark">#616161</color>
+
+    <color name="theme_blue_background">#84ffff</color>
+    <color name="theme_blue_primary">#03a9f4</color>
+    <color name="theme_blue_accent">#ff193a</color>
+    <color name="theme_blue_text">@color/text_light</color>
+    <color name="theme_blue_primary_dark">#038dcc</color>
+
+    <color name="theme_green_background">#b9f6ca</color>
+    <color name="theme_green_primary">#1de9b6</color>
+    <color name="theme_green_accent">#e919ff</color>
+    <color name="theme_green_text">@color/text_dark</color>
+    <color name="theme_green_primary_dark">#19cc9f</color>
+
+    <color name="theme_purple_background">#b388ff</color>
+    <color name="theme_purple_primary">#7e57c2</color>
+    <color name="theme_purple_accent">#ff9419</color>
+    <color name="theme_purple_text">@color/text_light</color>
+    <color name="theme_purple_primary_dark">#6c4aa6</color>
+
+    <color name="theme_red_background">#ff8a80</color>
+    <color name="theme_red_primary">#ff5252</color>
+    <color name="theme_red_accent">#fffc19</color>
+    <color name="theme_red_text">@color/text_light</color>
+    <color name="theme_red_primary_dark">#e64a4a</color>
+
+    <color name="theme_yellow_background">#ffff8d</color>
+    <color name="theme_yellow_primary">#ffeb3b</color>
+    <color name="theme_yellow_accent">#19dcff</color>
+    <color name="theme_yellow_text">@color/text_dark</color>
+    <color name="theme_yellow_primary_dark">#e6d335</color>
+
+    <color name="theme_spe_background">#97D9D9</color>
+    <color name="theme_spe_primary">#006666</color>
+    <color name="theme_spe_accent">#AA4D00</color>
+    <color name="theme_spe_text">@color/text_light</color>
+    <color name="theme_spe_primary_dark">#004242</color>
+
+    <color name="theme_orange_background">@color/color_orange_400</color>
+    <color name="theme_orange_primary">@color/color_orange_600</color>
+    <color name="theme_orange_accent">#AA4D00</color>
+    <color name="theme_orange_text">@color/text_light</color>
+    <color name="theme_orange_primary_dark">@color/color_orange_700</color>
 
     <color name="color_red_50">#FFEBEE</color>
     <color name="color_red_100">#FFCDD2</color>
