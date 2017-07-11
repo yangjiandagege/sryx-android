@@ -1,4 +1,4 @@
-package com.yj.sryx.activity;
+package com.yj.sryx.controller;
 
 import android.content.Intent;
 import android.os.Bundle;

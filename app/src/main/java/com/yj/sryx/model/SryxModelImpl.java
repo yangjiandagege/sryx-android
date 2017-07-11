@@ -6,8 +6,12 @@ import com.yj.sryx.manager.httpRequest.HttpResultFunc;
 import com.yj.sryx.manager.httpRequest.RetrofitSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.ProgressSubscriber;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.beans.Game;
+import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.model.service.SryxService;
+
+import java.util.List;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -35,6 +39,26 @@ public class SryxModelImpl implements SryxModel {
                 user.getNickname(), user.getSex(), user.getLanguage(),
                 user.getCountry(), user.getProvince(), user.getCity())
                 .map(new HttpResultFunc<String>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    @Override
+    public void getGameById(String gameId, SubscriberOnNextListener<Game> callback) {
+        mService.getGameById(gameId)
+                .map(new HttpResultFunc<Game>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    @Override
+    public void getRolesInGame(String gameId, SubscriberOnNextListener<List<Role>> callback) {
+        mService.getRolesInGame(gameId)
+                .map(new HttpResultFunc<List<Role>>())
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

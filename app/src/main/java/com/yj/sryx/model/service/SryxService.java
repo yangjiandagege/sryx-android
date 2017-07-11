@@ -1,7 +1,11 @@
 package com.yj.sryx.model.service;
 
+import com.yj.sryx.model.beans.Game;
 import com.yj.sryx.model.beans.HttpResult;
+import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.model.beans.WxGetTokenRes;
+
+import java.util.List;
 
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -31,4 +35,10 @@ public interface SryxService {
             @Query("killerNum") Integer killerNum,
             @Query("policeNum") Integer policeNum,
             @Query("citizenNum") Integer citizenNum);
+
+    @GET("sryx/getgamebyid")
+    Observable<HttpResult<Game>> getGameById(@Query("gameId") String gameId);
+
+    @GET("sryx/getrolelistingame")
+    Observable<HttpResult<List<Role>>> getRolesInGame(@Query("gameId") String gameId);
 }

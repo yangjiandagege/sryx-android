@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/theme_green_background">
+    <com.yj.sryx.widget.AcceBar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:toolbarTitle="准备游戏"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80px"
+        android:layout_margin="32px">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="18sp"
+            android:text="游戏编号 : "/>
+        <TextView
+            android:id="@+id/tv_game_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="20sp"
+            tools:text="3456"/>
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_grid_roles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32px"
+        android:layout_marginRight="32px"
+        android:background="@drawable/roles_grid_bg"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        android:transitionGroup="false"
+        app:layoutManager="android.support.v7.widget.GridLayoutManager"
+        app:spanCount="3"
+        tools:ignore="UnusedAttribute"/>
+</LinearLayout>

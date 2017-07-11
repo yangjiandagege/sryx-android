@@ -1,4 +1,4 @@
-package com.yj.sryx.activity;
+package com.yj.sryx.controller;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.ActivityStackManager;
 import com.zhy.autolayout.AutoFrameLayout;
 import com.zhy.autolayout.AutoLinearLayout;
@@ -25,15 +26,14 @@ public class BaseActivity extends AppCompatActivity {
 
     protected boolean useAutoLayout = true;
 
-    private ProgressDialog mProgressDialog          = null;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (SryxApp.currentThemeId != 0) {
+            setTheme(SryxApp.currentThemeId);
+        }
         //Activity栈管理，启动时添加到栈中
         ActivityStackManager.getInstance().addActivity(this);
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setCanceledOnTouchOutside(false);
     }
 
     @Override
@@ -60,27 +60,6 @@ public class BaseActivity extends AppCompatActivity {
             if (view != null) return view;
         }
         return super.onCreateView(name, context, attrs);
-    }
-
-    public void showProgressDialog(String msg, boolean shieldKey) {
-        mProgressDialog.setMessage(msg);
-        if (shieldKey) {
-            mProgressDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                @Override
-                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            });
-        }
-        mProgressDialog.show();
-    }
-
-    public void hideProgressDialog() {
-        mProgressDialog.dismiss();
     }
 
     @Override

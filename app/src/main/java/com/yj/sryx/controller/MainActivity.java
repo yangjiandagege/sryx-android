@@ -1,4 +1,4 @@
-package com.yj.sryx.activity;
+package com.yj.sryx.controller;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -19,6 +19,7 @@ import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.SryxConfig;
 import com.yj.sryx.common.Category;
+import com.yj.sryx.manager.ActivityStackManager;
 import com.yj.sryx.manager.StatusBarUtil;
 import com.yj.sryx.model.LoginModel;
 import com.yj.sryx.model.LoginModelImpl;
@@ -125,5 +126,11 @@ public class MainActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        ActivityStackManager.getInstance().AppExit();
     }
 }

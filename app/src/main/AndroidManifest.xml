@@ -16,17 +16,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activity.SplashActivity"
+        <activity android:name=".controller.SplashActivity"
                   android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity"
+        <activity android:name=".controller.MainActivity"
                   android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".activity.QuizActivity"
+        <activity android:name=".controller.PrepareGameActivity"
+                  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".controller.QuizActivity"
                   android:theme="@style/AppTheme.QuizActivity"
                   android:screenOrientation="portrait"/>
         <activity

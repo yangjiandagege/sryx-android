@@ -1,5 +1,6 @@
-package com.yj.sryx.activity;
+package com.yj.sryx.controller;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +11,6 @@ import android.widget.Button;
 
 import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
-import com.yj.sryx.manager.httpRequest.BeanCallback;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
@@ -69,12 +69,14 @@ public class CreateGameFragment extends Fragment {
                 new SubscriberOnNextListener<String>() {
                     @Override
                     public void onSuccess(String s) {
-                        ToastUtils.showLongToast(mActivity, s);
+                        mActivity.finish();
+                        Intent intent = new Intent(mActivity, PrepareGameActivity.class);
+                        intent.putExtra(PrepareGameActivity.KEY_GAME_ID, s);
+                        startActivity(intent);
                     }
 
                     @Override
                     public void onError(String msg) {
-
                     }
                 });
     }
