@@ -22,4 +22,13 @@ public interface SryxService {
             @Query("country") String country,
             @Query("province") String province,
             @Query("city") String city);
+
+    @GET("sryx/creategame")
+    Observable<HttpResult<String>> createGame(
+            @Query("gameOwnerId") String gameOwnerId,
+            @Query("gameOwnerAvatarUrl") String gameOwnerAvatarUrl,
+            @Query("gameOwnerNickName") String gameOwnerNickName,
+            @Query("killerNum") Integer killerNum,
+            @Query("policeNum") Integer policeNum,
+            @Query("citizenNum") Integer citizenNum);
 }

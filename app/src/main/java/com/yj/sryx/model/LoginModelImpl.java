@@ -36,17 +36,8 @@ public class LoginModelImpl implements LoginModel{
     }
 
     @Override
-    public void wxLogin(String code, final BeanCallback<Void> callback) {
+    public void wxLogin(String code, final SubscriberOnNextListener<WxUser> callback) {
         final WxLoginService service = RetrofitSingleton.getWxInstance().create(WxLoginService.class);
-        SubscriberOnNextListener getAccessTokenOnNext = new SubscriberOnNextListener<WxUser>() {
-            @Override
-            public void onNext(WxUser result) {
-                sWxUser = result;
-                LocalUserManager.serializeUser(SryxApp.sContext, sWxUser);
-                updatePlayer(sWxUser, callback);
-                callback.onSuccess(null);
-            }
-        };
         service.getAccessToken(SryxConfig.WX_APP_ID, SryxConfig.WX_APP_SECRET, code, "authorization_code")
                 .flatMap(new Func1<WxGetTokenRes, Observable<WxUser>>() {
                     @Override
@@ -57,7 +48,7 @@ public class LoginModelImpl implements LoginModel{
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ProgressSubscriber(getAccessTokenOnNext, mContext));
+                .subscribe(new ProgressSubscriber(callback, mContext));
     }
 
     @Override
@@ -65,29 +56,8 @@ public class LoginModelImpl implements LoginModel{
         return LocalUserManager.isLocalUserExist(mContext);
     }
 
-    public void updatePlayer(WxUser user, final BeanCallback<Void> callback){
-        SryxService service = RetrofitSingleton.getInstance().create(SryxService.class);
-        service.updatePlayer(user.getOpenid(),user.getHeadimgurl(),
-                user.getNickname(), user.getSex(), user.getLanguage(),
-                user.getCountry(), user.getProvince(), user.getCity())
-                .map(new HttpResultFunc<String>())
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        LogUtils.logout(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(String result) {
-                    }
-                });
+    @Override
+    public void exitWxLogin() {
+        LocalUserManager.removeLocalUser(mContext);
     }
-
 }

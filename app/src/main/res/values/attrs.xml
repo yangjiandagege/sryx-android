@@ -25,6 +25,16 @@
         <attr name="pageCode" format="string"/>
     </declare-styleable>
 
+    <declare-styleable name="AmountView">
+        <!-- 左右2边+-按钮的宽度 -->
+        <attr name="btnWidth" format="dimension" />
+        <!-- 中间TextView的宽度 -->
+        <attr name="tvWidth" format="dimension" />
+        <!--<attr name="tvColor" format="color"/>-->
+        <attr name="tvTextSize" format="dimension"/>
+        <attr name="btnTextSize" format="dimension"/>
+    </declare-styleable>
+
     <declare-styleable name="QRCodeView">
         <!-- 扫描框距离toolbar底部的距离，默认值为90dp -->
         <attr name="qrcv_topOffset" format="dimension|reference" />

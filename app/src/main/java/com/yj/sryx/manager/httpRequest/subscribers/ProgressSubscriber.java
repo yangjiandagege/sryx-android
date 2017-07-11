@@ -59,7 +59,6 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     @Override
     public void onCompleted() {
         dismissProgressDialog();
-        Toast.makeText(context, "Get Top Movie Completed", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -77,7 +76,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
             Toast.makeText(context, "error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         dismissProgressDialog();
-
+        if (mSubscriberOnNextListener != null) {
+            mSubscriberOnNextListener.onError(e.getMessage());
+        }
     }
 
     /**
@@ -88,7 +89,7 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     @Override
     public void onNext(T t) {
         if (mSubscriberOnNextListener != null) {
-            mSubscriberOnNextListener.onNext(t);
+            mSubscriberOnNextListener.onSuccess(t);
         }
     }
 

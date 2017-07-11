@@ -22,6 +22,10 @@ public class LocalUserManager {
         return  FileUtils.isFileExists(context.getFilesDir() + PATH_USER_SERIALIZE);
     }
 
+    public static void removeLocalUser(Context context){
+        FileUtils.deleteFile(context.getFilesDir() + PATH_USER_SERIALIZE);
+    }
+
     public static WxUser unSerializeUser(Context context) {
         WxUser user =null;
         try {

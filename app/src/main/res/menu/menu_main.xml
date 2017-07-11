@@ -8,9 +8,18 @@
           android:orderInCategory="100"
           app:showAsAction="never"/>
 
+    <item android:id="@+id/action_qrscan"
+          android:title="扫描二维码"
+          android:orderInCategory="100"
+          app:showAsAction="never"/>
+
     <item android:id="@+id/action_rule"
           android:title="规则说明"
           android:orderInCategory="100"
           app:showAsAction="never"/>
 
+    <item android:id="@+id/action_exit"
+          android:title="退出登录"
+          android:orderInCategory="100"
+          app:showAsAction="never"/>
 </menu>

@@ -22,12 +22,6 @@ public class ApiException extends RuntimeException {
     private static String getApiExceptionMessage(String code, String detailMessage){
         String message = "";
         switch (code) {
-            case "201":
-                message = "该用户不存在";
-                break;
-            case "202":
-                message = "密码错误";
-                break;
             default:
                 if(detailMessage != null){
                     message = detailMessage;

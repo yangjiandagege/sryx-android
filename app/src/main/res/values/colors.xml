@@ -2,7 +2,9 @@
 <resources>
     <color name="colorPrimary">@color/theme_yellow_background</color>
     <color name="colorPrimaryDark">@color/theme_yellow_background</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#616161</color>
+
+    <color name="divider">#d2d2d2</color>
 
     <color name="color_white">@android:color/white</color>
 

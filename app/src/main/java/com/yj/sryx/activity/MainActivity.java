@@ -1,9 +1,7 @@
 package com.yj.sryx.activity;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -14,8 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -24,6 +20,8 @@ import com.yj.sryx.SryxApp;
 import com.yj.sryx.SryxConfig;
 import com.yj.sryx.common.Category;
 import com.yj.sryx.manager.StatusBarUtil;
+import com.yj.sryx.model.LoginModel;
+import com.yj.sryx.model.LoginModelImpl;
 import com.yj.sryx.utils.TransitionHelper;
 import com.yj.sryx.widget.CircleImageView;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
@@ -42,11 +40,13 @@ public class MainActivity extends BaseActivity {
     @Bind(R.id.acce_toolbar)
     Toolbar toolbar;
 
+    private LoginModel mLoginModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mLoginModel = new LoginModelImpl(this);
         initLayout();
     }
 
@@ -113,7 +113,14 @@ public class MainActivity extends BaseActivity {
         switch (id) {
             case R.id.action_shared:
                 break;
+            case R.id.action_qrscan:
+                break;
             case R.id.action_rule:
+                break;
+            case R.id.action_exit:
+                mLoginModel.exitWxLogin();
+                startActivity(new Intent(this, SplashActivity.class));
+                finish();
                 break;
         }
 

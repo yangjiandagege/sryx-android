@@ -12,18 +12,26 @@ import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.activity.MainActivity;
 import com.yj.sryx.activity.SplashActivity;
+import com.yj.sryx.manager.LocalUserManager;
+import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.LoginModel;
 import com.yj.sryx.model.LoginModelImpl;
 import com.yj.sryx.manager.httpRequest.BeanCallback;
 import com.yj.sryx.manager.ActivityStackManager;
+import com.yj.sryx.model.SryxModel;
+import com.yj.sryx.model.SryxModelImpl;
+import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.utils.LogUtils;
 
 import static com.yj.sryx.SryxApp.sWxApi;
+import static com.yj.sryx.SryxApp.sWxUser;
 
 public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     private LoginModel mLoginModel;
+    private SryxModel mSryxModel;
     private Activity mActivity;
 
     @Override
@@ -31,6 +39,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
         super.onCreate(savedInstanceState);
         mActivity = this;
         mLoginModel = new LoginModelImpl(this);
+        mSryxModel = new SryxModelImpl(this);
         sWxApi.handleIntent(this.getIntent(), this);
     }
 
@@ -54,19 +63,22 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
             case BaseResp.ErrCode.ERR_OK:
                 //发送成功
                 SendAuth.Resp sendResp = (SendAuth.Resp) resp;
-                mLoginModel.wxLogin(sendResp.code, new BeanCallback<Void>() {
+                //微信登录
+                mLoginModel.wxLogin(sendResp.code, new SubscriberOnNextListener<WxUser>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onSuccess(WxUser result) {
+                        sWxUser = result;
+                        LocalUserManager.serializeUser(SryxApp.sContext, sWxUser);
                         mActivity.finish();
                         ActivityStackManager.getInstance().finishActivity(SplashActivity.class);
                         Intent gotoMain = new Intent(mActivity, MainActivity.class);
                         mActivity.startActivity(gotoMain);
+                        //更新玩家信息
+                        mSryxModel.updatePlayer(sWxUser, null);
                     }
 
                     @Override
-                    public void onError(String msg) {
-                        mActivity.finish();
-                    }
+                    public void onError(String msg) {}
                 });
                 break;
             case BaseResp.ErrCode.ERR_USER_CANCEL:
