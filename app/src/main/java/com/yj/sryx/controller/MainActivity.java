@@ -2,8 +2,12 @@ package com.yj.sryx.controller;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
@@ -13,9 +17,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.util.Util;
+import com.flyco.dialog.listener.OnOperItemClickL;
+import com.flyco.dialog.widget.ActionSheetDialog;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.SryxConfig;
@@ -30,6 +45,7 @@ import com.yj.sryx.widget.CircleImageView;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
 import com.yj.sryx.widget.adapterrv.ViewHolder;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,6 +53,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+import static com.yj.sryx.SryxApp.sWxApi;
 
 public class MainActivity extends BaseActivity {
     @Bind(R.id.img_header)
@@ -49,7 +68,13 @@ public class MainActivity extends BaseActivity {
     Toolbar toolbar;
 
     private LoginModel mLoginModel;
-    private static final int                   MSG_SET_ALIAS    = 1001;
+    private static final int MSG_SET_ALIAS = 1001;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient mClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +83,9 @@ public class MainActivity extends BaseActivity {
         mLoginModel = new LoginModelImpl(this);
         initJpush();
         initLayout();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        mClient = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void initJpush() {
@@ -70,7 +98,7 @@ public class MainActivity extends BaseActivity {
 
     private final Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(android.os.Message msg) {
+        public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_SET_ALIAS:
@@ -157,13 +185,47 @@ public class MainActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+    public static byte[] bmpToByteArray(Bitmap bmp){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
+    }
+
+    private void wxShared(int flag){
+        WXWebpageObject webpage = new WXWebpageObject();
+        webpage.webpageUrl = "https://www.ywwxmm.cn/";
+        WXMediaMessage msg = new WXMediaMessage(webpage);
+        msg.title = "天黑请闭眼";
+        msg.description = "天黑请闭眼";
+        Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.mipmap.sryx_logo);
+        Bitmap thumbBmp = Bitmap.createScaledBitmap(thumb,120,120,true);
+        msg.thumbData = bmpToByteArray(thumbBmp);
+
+        SendMessageToWX.Req req = new SendMessageToWX.Req();
+        req.transaction = String.valueOf(System.currentTimeMillis());
+        req.message = msg;
+        req.scene = (flag == 0) ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;
+        sWxApi.sendReq(req);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         switch (id) {
             case R.id.action_shared:
+                final String[] stringItems = {"分享给微信好友", "分享到朋友圈"};
+                final ActionSheetDialog dialog = new ActionSheetDialog(this, stringItems, null);
+                dialog.title("选择分享途径")
+                        .titleTextSize_SP(14.5f)
+                        .show();
+                dialog.setOnOperItemClickL(new OnOperItemClickL() {
+                    @Override
+                    public void onOperItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        wxShared(position);
+                        dialog.dismiss();
+                    }
+                });
                 break;
             case R.id.action_qrscan:
                 startActivity(new Intent(this, QrCodeScanActivity.class));
@@ -184,5 +246,41 @@ public class MainActivity extends BaseActivity {
     public void onBackPressed() {
         super.onBackPressed();
         ActivityStackManager.getInstance().AppExit();
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Main Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        mClient.connect();
+        AppIndex.AppIndexApi.start(mClient, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(mClient, getIndexApiAction());
+        mClient.disconnect();
     }
 }
