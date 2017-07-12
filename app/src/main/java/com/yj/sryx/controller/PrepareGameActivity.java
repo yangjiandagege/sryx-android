@@ -14,6 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.flyco.animation.BounceEnter.BounceTopEnter;
+import com.flyco.animation.SlideExit.SlideBottomExit;
+import com.flyco.dialog.listener.OnBtnClickL;
+import com.flyco.dialog.widget.MaterialDialog;
+import com.flyco.dialog.widget.NormalDialog;
 import com.yj.sryx.R;
 import com.yj.sryx.common.RecycleViewDivider;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
@@ -21,6 +26,7 @@ import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Game;
 import com.yj.sryx.model.beans.Role;
+import com.yj.sryx.utils.CountDownTimerUtil;
 import com.yj.sryx.utils.EncodingHandler;
 import com.yj.sryx.utils.SizeUtils;
 import com.yj.sryx.widget.AcceBar;
@@ -33,6 +39,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Created by eason.yang on 2017/7/11.
@@ -57,7 +65,7 @@ public class PrepareGameActivity extends BaseActivity {
     private SryxModel mSryxModel;
     private CommonAdapter mAdapter;
     private String mGameCode;
-
+    private CountDownTimerUtil mTimeCounter;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +78,19 @@ public class PrepareGameActivity extends BaseActivity {
 
     private void initLayout() {
         mGameCode = (String) getIntent().getExtras().get(KEY_GAME_ID);
-
+        mTimeCounter = new CountDownTimerUtil(120 * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                btnStartGame.setText("等待中("+millisUntilFinished / 1000+"s)");
+                btnStartGame.setClickable(false);
+                btnStartGame.setAlpha((float) 0.6);
+            }
+            @Override
+            public void onFinish() {
+                mTimeCounter.cancel();
+                showGameCancelDialog();
+            }
+        }.start();
         mSryxModel.getGameById(mGameCode, new SubscriberOnNextListener<Game>() {
             @Override
             public void onSuccess(Game s) {
@@ -119,6 +139,25 @@ public class PrepareGameActivity extends BaseActivity {
 
             @Override
             public void onError(String msg) {
+            }
+        });
+    }
+
+    private void showGameCancelDialog(){
+        final NormalDialog dialog = new NormalDialog(PrepareGameActivity.this);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.btnNum(1)
+                .content("还有小伙伴没有加入到游戏，本局游戏自动解散。")
+                .btnText("确定")
+                .showAnim(new BounceTopEnter())
+                .dismissAnim(new SlideBottomExit())
+                .show();
+
+        dialog.setOnBtnClickL(new OnBtnClickL() {
+            @Override
+            public void onBtnClick() {
+                PrepareGameActivity.this.finish();
+                dialog.dismiss();
             }
         });
     }

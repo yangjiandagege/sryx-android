@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,8 +23,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.util.Util;
+import com.flyco.animation.BounceEnter.BounceTopEnter;
+import com.flyco.animation.SlideExit.SlideBottomExit;
+import com.flyco.dialog.listener.OnBtnClickL;
 import com.flyco.dialog.listener.OnOperItemClickL;
 import com.flyco.dialog.widget.ActionSheetDialog;
+import com.flyco.dialog.widget.NormalDialog;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -244,8 +249,31 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        ActivityStackManager.getInstance().AppExit();
+        final NormalDialog dialog = new NormalDialog(this);
+        dialog.content("大爷,真的要走吗?再玩会儿嘛\n~(●—●)~")//
+                .style(NormalDialog.STYLE_TWO)//
+                .titleTextSize(23)//
+                .btnText("再玩会儿", "残忍退出")//
+                .btnTextColor(Color.parseColor("#383838"), Color.parseColor("#D4D4D4"))//
+                .btnTextSize(16f, 16f)
+                .showAnim(new BounceTopEnter())
+                .dismissAnim(new SlideBottomExit())
+                .show();
+
+        dialog.setOnBtnClickL(
+                new OnBtnClickL() {
+                    @Override
+                    public void onBtnClick() {
+                        dialog.dismiss();
+                    }
+                },
+                new OnBtnClickL() {
+                    @Override
+                    public void onBtnClick() {
+                        dialog.superDismiss();
+                        ActivityStackManager.getInstance().AppExit();
+                    }
+                });
     }
 
     /**
