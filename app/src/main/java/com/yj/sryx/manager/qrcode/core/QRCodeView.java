@@ -64,6 +64,21 @@ public abstract class QRCodeView extends FrameLayout implements Camera.PreviewCa
         }
     }
 
+    private int findFrontFacingCamera() {
+        int cameraId = 0;
+        // Search for the front facing camera
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                cameraId = i;
+                break;
+            }
+        }
+        return cameraId;
+    }
+
     /**
      * 打开摄像头开始预览，但是并未开始识别
      */

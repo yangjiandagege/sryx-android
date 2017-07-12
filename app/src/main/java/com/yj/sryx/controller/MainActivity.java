@@ -166,6 +166,7 @@ public class MainActivity extends BaseActivity {
             case R.id.action_shared:
                 break;
             case R.id.action_qrscan:
+                startActivity(new Intent(this, QrCodeScanActivity.class));
                 break;
             case R.id.action_rule:
                 break;

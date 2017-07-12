@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.yj.sryx">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
     <!--微信sdk相关权限-->
     <!--<uses-permission android:name="android.permission.INTERNET"/>-->
     <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>-->
@@ -58,6 +63,8 @@
         </activity>
         <activity android:name=".controller.QuizActivity"
                   android:theme="@style/AppTheme.QuizActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".controller.QrCodeScanActivity"
                   android:screenOrientation="portrait"/>
         <activity
             android:name=".wxapi.WXEntryActivity"
