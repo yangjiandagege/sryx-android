@@ -145,19 +145,18 @@ public class PrepareGameActivity extends BaseActivity {
 
     private void showGameCancelDialog(){
         final NormalDialog dialog = new NormalDialog(PrepareGameActivity.this);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.btnNum(1)
-                .content("还有小伙伴没有加入到游戏，本局游戏自动解散。")
-                .btnText("确定")
-                .showAnim(new BounceTopEnter())
-                .dismissAnim(new SlideBottomExit())
+        dialog.content("还有小伙伴没有加入到游戏，本局游戏自动解散。~")//
+                .btnNum(1)
+                .btnText("确定")//
+                .showAnim(new BounceTopEnter())//
+                .dismissAnim(new SlideBottomExit())//
                 .show();
 
         dialog.setOnBtnClickL(new OnBtnClickL() {
             @Override
             public void onBtnClick() {
                 PrepareGameActivity.this.finish();
-                dialog.dismiss();
+                dialog.superDismiss();
             }
         });
     }
@@ -186,5 +185,11 @@ public class PrepareGameActivity extends BaseActivity {
             case R.id.btn_start_game:
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTimeCounter.cancel();
     }
 }
