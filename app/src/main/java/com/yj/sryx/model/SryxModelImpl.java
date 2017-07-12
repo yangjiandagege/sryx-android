@@ -7,13 +7,16 @@ import com.yj.sryx.manager.httpRequest.RetrofitSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.ProgressSubscriber;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.beans.Game;
+import com.yj.sryx.model.beans.HttpResult;
 import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.model.service.SryxService;
 
 import java.util.List;
 
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -65,6 +68,27 @@ public class SryxModelImpl implements SryxModel {
                 .subscribe(new ProgressSubscriber(callback, mContext));
     }
 
+    @Override
+    public void joinGameByCode(String gameCode,
+                               final String playerId,
+                               final String playerNickName,
+                               final String playerAvatarUrl,
+                               SubscriberOnNextListener<String> callback) {
+        mService.getGameByInviteCode(gameCode)
+                .map(new HttpResultFunc<Game>())
+                .flatMap(new Func1<Game, Observable<HttpResult<String>>>() {
+                    @Override
+                    public Observable<HttpResult<String>> call(Game result) {
+                        return mService.joinGameById(result.getGameId(), playerId, playerNickName, playerAvatarUrl);
+                    }
+                })
+                .map(new HttpResultFunc<String>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
     /**
      * 创建游戏
      * @param gameOwnerId
@@ -90,4 +114,6 @@ public class SryxModelImpl implements SryxModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new ProgressSubscriber(callback, mContext));
     }
+
+
 }

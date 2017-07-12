@@ -25,4 +25,6 @@ public interface SryxModel {
     void getGameById(String gameId, SubscriberOnNextListener<Game> callback);
 
     void getRolesInGame(String gameId, SubscriberOnNextListener<List<Role>> callback);
+
+    void joinGameByCode(String gameCode, String playerId, String playerNickName, String playerAvatarUrl, SubscriberOnNextListener<String> callback);
 }

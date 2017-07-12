@@ -41,4 +41,14 @@ public interface SryxService {
 
     @GET("sryx/getrolelistingame")
     Observable<HttpResult<List<Role>>> getRolesInGame(@Query("gameId") String gameId);
+
+    @GET("sryx/getgamebyinvitecode")
+    Observable<HttpResult<Game>> getGameByInviteCode(@Query("inviteCode") String inviteCode);
+
+    @GET("sryx/updaterole")
+    Observable<HttpResult<String>> joinGameById(
+            @Query("gameId") Integer gameId,
+            @Query("playerId") String playerId,
+            @Query("playerNickName") String playerNickName,
+            @Query("playerAvatarUrl") String playerAvatarUrl);
 }

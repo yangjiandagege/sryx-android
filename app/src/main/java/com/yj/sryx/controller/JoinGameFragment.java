@@ -10,16 +10,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.yj.sryx.R;
+import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
+import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.widget.MultiEditText;
 import com.yj.sryx.widget.virtualKeyboard.OnTextInputListener;
 import com.yj.sryx.widget.virtualKeyboard.VirtualKeyboardView;
 
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.yj.sryx.SryxApp.sWxUser;
 
 /**
  * Created by eason.yang on 2017/3/6.
@@ -48,10 +54,24 @@ public class JoinGameFragment extends Fragment {
             public void onTextInput(String content) {
                 if (content.length() == 4) {
                     ToastUtils.showLongToast(mActivity, "ok");
+                    joinGameByCode(content);
                 }
             }
         });
         return view;
+    }
+
+    private void joinGameByCode(String gameCode) {
+        mSryxModel.joinGameByCode(gameCode, sWxUser.getOpenid(), sWxUser.getNickname(), sWxUser.getHeadimgurl(), new SubscriberOnNextListener<String>() {
+            @Override
+            public void onSuccess(String roles) {
+
+            }
+
+            @Override
+            public void onError(String msg) {
+            }
+        });
     }
 
     @Override
