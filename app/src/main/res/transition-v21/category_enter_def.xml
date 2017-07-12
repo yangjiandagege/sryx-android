@@ -19,12 +19,6 @@
         <targets>
             <target android:excludeId="@android:id/statusBarBackground" />
             <target android:excludeId="@android:id/navigationBarBackground" />
-            <target android:excludeId="@id/appbar" />
         </targets>
     </slide>
-    <fade>
-        <targets>
-            <target android:targetId="@id/appbar" />
-        </targets>
-    </fade>
 </transitionSet>

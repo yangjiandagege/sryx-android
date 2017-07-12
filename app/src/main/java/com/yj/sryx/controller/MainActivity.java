@@ -3,6 +3,7 @@ package com.yj.sryx.controller;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
@@ -19,6 +20,7 @@ import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.SryxConfig;
 import com.yj.sryx.common.Category;
+import com.yj.sryx.jpush.LocalAliasAndTags;
 import com.yj.sryx.manager.ActivityStackManager;
 import com.yj.sryx.manager.StatusBarUtil;
 import com.yj.sryx.model.LoginModel;
@@ -28,8 +30,13 @@ import com.yj.sryx.widget.CircleImageView;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
 import com.yj.sryx.widget.adapterrv.ViewHolder;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
 
 public class MainActivity extends BaseActivity {
     @Bind(R.id.img_header)
@@ -42,18 +49,62 @@ public class MainActivity extends BaseActivity {
     Toolbar toolbar;
 
     private LoginModel mLoginModel;
+    private static final int                   MSG_SET_ALIAS    = 1001;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mLoginModel = new LoginModelImpl(this);
+        initJpush();
         initLayout();
     }
+
+    private void initJpush() {
+        String alias = SryxApp.sWxUser.getOpenid();
+        Set<String> tags = new HashSet<>();
+        tags.add("sryx");
+        LocalAliasAndTags localAliasAndTags = new LocalAliasAndTags(alias, tags);
+        mHandler.sendMessage(mHandler.obtainMessage(MSG_SET_ALIAS, localAliasAndTags));
+    }
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case MSG_SET_ALIAS:
+                    // 调用 JPush 接口来设置别名。
+                    LocalAliasAndTags localAliasAndTags = (LocalAliasAndTags) msg.obj;
+                    JPushInterface.setAliasAndTags(getApplicationContext(), localAliasAndTags.alias,
+                            localAliasAndTags.tags, mAliasCallback);
+                    break;
+            }
+        }
+    };
+
+    private final TagAliasCallback mAliasCallback = new TagAliasCallback() {
+        @Override
+        public void gotResult(int code, String alias, Set<String> tags) {
+            switch (code) {
+                case 0:
+                    // 建议这里往 SharePreference 里写一个成功设置的状态。成功设置一次后，以后不必再次设置了。
+                    break;
+                case 6002:
+                    // 延迟 60 秒来调用 Handler 设置别名
+                    mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_SET_ALIAS,
+                            new LocalAliasAndTags(alias, tags)), 1000 * 60);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     private void initLayout() {
         StatusBarUtil.StatusBarLightMode(this);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         Glide.with(this)
                 .load(SryxApp.sWxUser.getHeadimgurl())
                 .into(imgHeader);

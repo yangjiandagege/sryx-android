@@ -11,24 +11,33 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:toolbarTitle="准备游戏"/>
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80px"
         android:layout_margin="32px">
         <TextView
+            android:id="@+id/tv_game_code_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:textSize="18sp"
             android:text="游戏编号 : "/>
         <TextView
             android:id="@+id/tv_game_code"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_toRightOf="@+id/tv_game_code_title"
+            android:layout_centerVertical="true"
             android:textSize="20sp"
             tools:text="3456"/>
-    </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_qrcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:background="@mipmap/qr_code"/>
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_grid_roles"
@@ -44,4 +53,33 @@
         app:layoutManager="android.support.v7.widget.GridLayoutManager"
         app:spanCount="3"
         tools:ignore="UnusedAttribute"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60px"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_cancle_game"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="16px"
+            android:layout_marginLeft="32px"
+            android:padding="28px"
+            android:background="@drawable/canclegame_btn"
+            android:textColor="#909090"
+            android:text="取消游戏"/>
+        <Button
+            android:id="@+id/btn_start_game"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="32px"
+            android:layout_marginLeft="16px"
+            android:padding="28px"
+            android:background="@drawable/creategame_btn"
+            android:textColor="@color/color_white"
+            android:text="开始游戏"/>
+    </LinearLayout>
 </LinearLayout>

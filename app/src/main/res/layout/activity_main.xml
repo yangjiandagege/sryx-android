@@ -5,7 +5,7 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:background="@color/theme_yellow_background">
-    <include layout="@layout/acce_toolbar_dark"/>
+    <include layout="@layout/toolbar_main"/>
 
     <com.yj.sryx.widget.CircleImageView
         android:id="@+id/img_header"

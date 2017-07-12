@@ -17,6 +17,9 @@ public class SryxConfig {
     public static final String WX_APP_SECRET = "cb42bbe845afb2d304851018dcf0d0fc";
     public static final String WX_APP_ID = "wx76c99251f28c1316";
 
+    public static final String JPUSH_APP_KEY = "40cf4209576fc7f9e65276c0";
+    public static final String JPUSH_APP_SECRET = "1bc83fa64ac108bd320e1727";
+
     public class Key {
         public static final String CATEGORY_ID = "category_id";
         public static final String PAGE_ID = "page_id";
