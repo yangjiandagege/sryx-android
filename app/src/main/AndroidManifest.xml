@@ -150,7 +150,7 @@
 
         <!-- User defined.  For test only  用户自定义的广播接收器-->
         <receiver
-            android:name="com.yj.sryx.jpush.MyReceiver"
+            android:name="com.yj.sryx.jpush.JPushReceiver"
             android:exported="false"
             android:enabled="true">
             <intent-filter>

@@ -21,6 +21,7 @@ import com.flyco.dialog.widget.MaterialDialog;
 import com.flyco.dialog.widget.NormalDialog;
 import com.yj.sryx.R;
 import com.yj.sryx.common.RecycleViewDivider;
+import com.yj.sryx.manager.RxBus;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
@@ -28,6 +29,7 @@ import com.yj.sryx.model.beans.Game;
 import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.utils.CountDownTimerUtil;
 import com.yj.sryx.utils.EncodingHandler;
+import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.SizeUtils;
 import com.yj.sryx.widget.AcceBar;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
@@ -39,6 +41,10 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
@@ -74,6 +80,25 @@ public class PrepareGameActivity extends BaseActivity {
         mSryxModel = new SryxModelImpl(this);
         mRoleList = new ArrayList<>();
         initLayout();
+        initRxbus();
+    }
+
+    private void initRxbus() {
+        Observable<String> observable = RxBus.getInstance().register(this);
+        observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                LogUtils.logout("received : "+s);
+                switch (s){
+                    case "0":
+                    case "1":
+                        getRolesInGame();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
 
     private void initLayout() {
@@ -122,7 +147,10 @@ public class PrepareGameActivity extends BaseActivity {
             }
         };
         rvGridRoles.setAdapter(mAdapter);
+        getRolesInGame();
+    }
 
+    private void getRolesInGame(){
         mSryxModel.getRolesInGame(mGameCode, new SubscriberOnNextListener<List<Role>>() {
             @Override
             public void onSuccess(List<Role> roles) {
@@ -191,5 +219,6 @@ public class PrepareGameActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         mTimeCounter.cancel();
+        RxBus.getInstance().unregister(this);
     }
 }
