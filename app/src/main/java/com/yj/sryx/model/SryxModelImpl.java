@@ -99,6 +99,16 @@ public class SryxModelImpl implements SryxModel {
                 .subscribe(new ProgressSubscriber(callback, mContext));
     }
 
+    @Override
+    public void setRoleOut(Integer death, Integer roleId, Integer gameId, SubscriberOnNextListener<String> callback) {
+        mService.setRoleOut(death, roleId, gameId)
+                .map(new HttpResultFunc<String>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
     /**
      * 创建游戏
      * @param gameOwnerId

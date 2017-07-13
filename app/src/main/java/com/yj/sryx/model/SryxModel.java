@@ -29,4 +29,6 @@ public interface SryxModel {
     void joinGameByCode(String gameCode, String playerId, String playerNickName, String playerAvatarUrl, SubscriberOnNextListener<String> callback);
 
     void cancleGame(Integer gameId, SubscriberOnNextListener<String> callback);
+
+    void setRoleOut(Integer death, Integer roleId, Integer gameId, SubscriberOnNextListener<String> callback);
 }

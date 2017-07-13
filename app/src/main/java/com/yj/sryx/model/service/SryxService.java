@@ -56,4 +56,11 @@ public interface SryxService {
     Observable<HttpResult<String>> cancleGame(
             @Query("state") Integer state,
             @Query("gameId") Integer gameId);
+
+
+    @GET("sryx/updateroledeathstate")
+    Observable<HttpResult<String>> setRoleOut(
+            @Query("death") Integer state,
+            @Query("roleId") Integer roleId,
+            @Query("gameId") Integer gameId);
 }

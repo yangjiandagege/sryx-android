@@ -16,7 +16,25 @@ public class Role implements Serializable{
     private String 	deathTime;
     private String 	createTime;
     private String 	remark;
-    
+
+	public String getRoleName() {
+		String roleName = null;
+		switch(roleType){
+			case 0:
+				roleName = "杀手";
+				break;
+			case 1:
+				roleName = "警察";
+				break;
+			case 2:
+				roleName = "平民";
+				break;
+			case 3:
+				roleName = "裁判";
+				break;
+		}
+		return roleName;
+	}
 	public Integer getRoleId() {
 		return roleId;
 	}

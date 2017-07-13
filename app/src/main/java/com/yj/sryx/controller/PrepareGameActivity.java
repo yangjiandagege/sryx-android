@@ -1,5 +1,6 @@
 package com.yj.sryx.controller;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -170,7 +171,7 @@ public class PrepareGameActivity extends BaseActivity {
             }
             @Override
             public void onFinish() {
-                mTimeCounter.cancel();
+                this.cancel();
                 showGameTimeOutCancelDialog();
             }
         }.start();
@@ -255,6 +256,10 @@ public class PrepareGameActivity extends BaseActivity {
                 showGameCancelDialog();
                 break;
             case R.id.btn_start_game:
+                Intent intent = new Intent(PrepareGameActivity.this, GameManageActivity.class);
+                intent.putExtra(GameManageActivity.KEY_GAME_ID, mGame.getGameId());
+                startActivity(intent);
+                finish();
                 break;
         }
     }
