@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.yj.sryx.R;
+import com.yj.sryx.SryxConfig;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
@@ -53,7 +54,6 @@ public class JoinGameFragment extends Fragment {
             @Override
             public void onTextInput(String content) {
                 if (content.length() == 4) {
-                    ToastUtils.showLongToast(mActivity, "ok");
                     joinGameByCode(content);
                 }
             }
@@ -70,8 +70,29 @@ public class JoinGameFragment extends Fragment {
 
             @Override
             public void onError(String msg) {
+
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(data != null){
+            String gameCode = data.getExtras().getString(QrCodeScanActivity.QR_SCAN_RESULT);
+            ToastUtils.showLongToast(mActivity, gameCode);
+            String[] strArray = gameCode.split("=");
+            String name = strArray[0];
+            String value = strArray[1];
+            switch (name){
+                case SryxConfig.Key.GAME_CODE:
+                    edtGameCode.setText(value);
+                    joinGameByCode(value);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @Override
@@ -82,6 +103,6 @@ public class JoinGameFragment extends Fragment {
 
     @OnClick(R.id.tv_scan)
     public void onClick() {
-        startActivity(new Intent(mActivity, QrCodeScanActivity.class));
+        startActivityForResult(new Intent(mActivity, QrCodeScanActivity.class), 1);
     }
 }

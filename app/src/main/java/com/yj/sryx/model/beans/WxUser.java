@@ -19,6 +19,12 @@ public class WxUser implements Serializable {
     private String headimgurl;
     private String unionid;
 
+    public WxUser(String openid, String nickname, String headimgurl) {
+        this.openid = openid;
+        this.nickname = nickname;
+        this.headimgurl = headimgurl;
+    }
+
     public String getOpenid() {
         return openid;
     }

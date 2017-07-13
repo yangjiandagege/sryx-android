@@ -89,6 +89,16 @@ public class SryxModelImpl implements SryxModel {
                 .subscribe(new ProgressSubscriber(callback, mContext));
     }
 
+    @Override
+    public void cancleGame(Integer gameId, SubscriberOnNextListener<String> callback) {
+        mService.cancleGame(3, gameId)
+                .map(new HttpResultFunc<String>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
     /**
      * 创建游戏
      * @param gameOwnerId

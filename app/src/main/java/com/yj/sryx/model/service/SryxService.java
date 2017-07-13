@@ -51,4 +51,9 @@ public interface SryxService {
             @Query("playerId") String playerId,
             @Query("playerNickName") String playerNickName,
             @Query("playerAvatarUrl") String playerAvatarUrl);
+
+    @GET("sryx/updategamestate")
+    Observable<HttpResult<String>> cancleGame(
+            @Query("state") Integer state,
+            @Query("gameId") Integer gameId);
 }

@@ -1,6 +1,7 @@
 package com.yj.sryx.controller;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,13 +21,16 @@ import com.flyco.dialog.listener.OnBtnClickL;
 import com.flyco.dialog.widget.MaterialDialog;
 import com.flyco.dialog.widget.NormalDialog;
 import com.yj.sryx.R;
+import com.yj.sryx.SryxConfig;
 import com.yj.sryx.common.RecycleViewDivider;
+import com.yj.sryx.manager.ActivityStackManager;
 import com.yj.sryx.manager.RxBus;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Game;
 import com.yj.sryx.model.beans.Role;
+import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.utils.CountDownTimerUtil;
 import com.yj.sryx.utils.EncodingHandler;
 import com.yj.sryx.utils.LogUtils;
@@ -47,6 +51,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+import static com.yj.sryx.SryxApp.sWxUser;
 
 /**
  * Created by eason.yang on 2017/7/11.
@@ -70,8 +75,10 @@ public class PrepareGameActivity extends BaseActivity {
     private List<Role> mRoleList;
     private SryxModel mSryxModel;
     private CommonAdapter mAdapter;
-    private String mGameCode;
+    private String mGameId;
     private CountDownTimerUtil mTimeCounter;
+    private Game mGame;
+    private List<WxUser> mWxUserListForTest = new ArrayList<>();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,8 +86,24 @@ public class PrepareGameActivity extends BaseActivity {
         ButterKnife.bind(this);
         mSryxModel = new SryxModelImpl(this);
         mRoleList = new ArrayList<>();
+        initData();
         initLayout();
         initRxbus();
+    }
+
+    private void initData() {
+        mWxUserListForTest.add(new WxUser("oNMwb0bDbMJyl84q5jAddjyBexmA",
+                "我是MT",
+                "http://wx.qlogo.cn/mmopen/vi_32/hzgRzL39o1b1NVPlhfoFZqapqUNUvnlkKhcIshXkTkxDpJdHnh3LMz7g1eQbhUBnicx2mwndpduiazS39phM6ekg/0"));
+        mWxUserListForTest.add(new WxUser("oNMwb0dFoGQ7TvHJd7jbyFdmjgk4",
+                "被人追杀的eason",
+                "http://wx.qlogo.cn/mmopen/vi_32/GvzrAKyDiboTQJWicAKm5ejicUcMB9txkW9aApDBgvG8avfeA82p6b2ghskI02IJuC2RM1NdzvCAXaCHuACK6oAOQ/0"));
+        mWxUserListForTest.add(new WxUser("oNMwb0YSPcT4vXxOjuO75xsbwOyo",
+                "边城浪子",
+                "http://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI9Nicr0ahll9C3nZibUzsKF1xdBelmT08N0PBT4HfY4BvmEjkjvgJx6BFwFFYqTV8rCKbHzydrKvibQ/0"));
+        mWxUserListForTest.add(new WxUser("oNMwb0VrgsjHBw7I6dG64xBwJYuQ",
+                "习大喵子",
+                "http://wx.qlogo.cn/mmopen/vi_32/5YSF1tBkafDQGIIic9uUqsc3PwYUcoCQWNbD1rD3OlZmEYVSOBFG0UkYNibEUHyxh1icvmQOysqm1zVJdDFzeeUiag/0"));
     }
 
     private void initRxbus() {
@@ -91,8 +114,14 @@ public class PrepareGameActivity extends BaseActivity {
                 LogUtils.logout("received : "+s);
                 switch (s){
                     case "0":
+                        getRolesInGame();
+                        break;
                     case "1":
                         getRolesInGame();
+                        mTimeCounter.cancel();
+                        btnStartGame.setText("开始游戏");
+                        btnStartGame.setClickable(true);
+                        btnStartGame.setAlpha(1);
                         break;
                     default:
                         break;
@@ -101,8 +130,37 @@ public class PrepareGameActivity extends BaseActivity {
         });
     }
 
+    int counter = 0;
     private void initLayout() {
-        mGameCode = (String) getIntent().getExtras().get(KEY_GAME_ID);
+        btnCancleGame.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                new CountDownTimerUtil(mWxUserListForTest.size() * 1000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        mSryxModel.joinGameByCode(mGame.getInviteCode(),
+                                mWxUserListForTest.get(counter).getOpenid(),
+                                mWxUserListForTest.get(counter).getNickname(),
+                                mWxUserListForTest.get(counter).getHeadimgurl(), null);
+                        counter ++;
+                        btnCancleGame.setClickable(false);
+                    }
+                    @Override
+                    public void onFinish() {
+                        mSryxModel.joinGameByCode(mGame.getInviteCode(),
+                                mWxUserListForTest.get(counter).getOpenid(),
+                                mWxUserListForTest.get(counter).getNickname(),
+                                mWxUserListForTest.get(counter).getHeadimgurl(), null);
+                        mTimeCounter.cancel();
+                        btnCancleGame.setClickable(true);
+                        counter = 0;
+                    }
+                }.start();
+                return true;
+            }
+        });
+        mGameId = (String) getIntent().getExtras().get(KEY_GAME_ID);
         mTimeCounter = new CountDownTimerUtil(120 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -113,13 +171,14 @@ public class PrepareGameActivity extends BaseActivity {
             @Override
             public void onFinish() {
                 mTimeCounter.cancel();
-                showGameCancelDialog();
+                showGameTimeOutCancelDialog();
             }
         }.start();
-        mSryxModel.getGameById(mGameCode, new SubscriberOnNextListener<Game>() {
+        mSryxModel.getGameById(mGameId, new SubscriberOnNextListener<Game>() {
             @Override
-            public void onSuccess(Game s) {
-                tvGameCode.setText(s.getInviteCode());
+            public void onSuccess(Game game) {
+                mGame = game;
+                tvGameCode.setText(game.getInviteCode());
             }
 
             @Override
@@ -151,42 +210,26 @@ public class PrepareGameActivity extends BaseActivity {
     }
 
     private void getRolesInGame(){
-        mSryxModel.getRolesInGame(mGameCode, new SubscriberOnNextListener<List<Role>>() {
-            @Override
-            public void onSuccess(List<Role> roles) {
-                if (roles.size() > 9) {
-                    ViewGroup.LayoutParams lp = rvGridRoles.getLayoutParams();
-                    lp.height = SizeUtils.dp2px(PrepareGameActivity.this, 330);
-                    rvGridRoles.setLayoutParams(lp);
-                    rvGridRoles.requestLayout();
+        if(mSryxModel != null) {
+            mSryxModel.getRolesInGame(mGameId, new SubscriberOnNextListener<List<Role>>() {
+                @Override
+                public void onSuccess(List<Role> roles) {
+                    if (roles.size() > 9) {
+                        ViewGroup.LayoutParams lp = rvGridRoles.getLayoutParams();
+                        lp.height = SizeUtils.dp2px(PrepareGameActivity.this, 330);
+                        rvGridRoles.setLayoutParams(lp);
+                        rvGridRoles.requestLayout();
+                    }
+                    mRoleList.clear();
+                    mRoleList.addAll(roles);
+                    mAdapter.notifyDataSetChanged();
                 }
-                mRoleList.clear();
-                mRoleList.addAll(roles);
-                mAdapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onError(String msg) {
-            }
-        });
-    }
-
-    private void showGameCancelDialog(){
-        final NormalDialog dialog = new NormalDialog(PrepareGameActivity.this);
-        dialog.content("还有小伙伴没有加入到游戏，本局游戏自动解散。~")//
-                .btnNum(1)
-                .btnText("确定")//
-                .showAnim(new BounceTopEnter())//
-                .dismissAnim(new SlideBottomExit())//
-                .show();
-
-        dialog.setOnBtnClickL(new OnBtnClickL() {
-            @Override
-            public void onBtnClick() {
-                PrepareGameActivity.this.finish();
-                dialog.superDismiss();
-            }
-        });
+                @Override
+                public void onError(String msg) {
+                }
+            });
+        }
     }
 
     @OnClick({R.id.iv_qrcode, R.id.btn_cancle_game, R.id.btn_start_game})
@@ -196,7 +239,7 @@ public class PrepareGameActivity extends BaseActivity {
                 View layout = getLayoutInflater().inflate(R.layout.dialog_show_qr_code,(ViewGroup) findViewById(R.id.dialog));
                 ImageView imgQrCode = (ImageView)layout.findViewById(R.id.img_qr_code);
                 try {
-                    Bitmap barBitmap = EncodingHandler.create2Code("game_code="+mGameCode, 800);
+                    Bitmap barBitmap = EncodingHandler.create2Code(SryxConfig.Key.GAME_CODE+"="+mGame.getInviteCode(), 800);
                     BitmapDrawable bd = new BitmapDrawable(barBitmap);
                     imgQrCode.setBackground(bd);
                 } catch (Exception e) {
@@ -209,10 +252,71 @@ public class PrepareGameActivity extends BaseActivity {
                 alertDialog.show();
                 break;
             case R.id.btn_cancle_game:
+                showGameCancelDialog();
                 break;
             case R.id.btn_start_game:
                 break;
         }
+    }
+
+    private void showGameCancelDialog() {
+        final NormalDialog dialog = new NormalDialog(this);
+        dialog.content("亲，您确定要取消本局游戏吗？")
+                .style(NormalDialog.STYLE_TWO)
+                .titleTextSize(23)
+                .btnText("继续游戏", "确认取消")
+                .btnTextColor(Color.parseColor("#383838"), Color.parseColor("#D4D4D4"))
+                .btnTextSize(16f, 16f)
+                .showAnim(new BounceTopEnter())
+                .dismissAnim(new SlideBottomExit())
+                .show();
+
+        dialog.setOnBtnClickL(
+                new OnBtnClickL() {
+                    @Override
+                    public void onBtnClick() {
+                        dialog.dismiss();
+                    }
+                },
+                new OnBtnClickL() {
+                    @Override
+                    public void onBtnClick() {
+                        mSryxModel.cancleGame(mGame.getGameId(), new SubscriberOnNextListener<String>() {
+                            @Override
+                            public void onSuccess(String s) {
+                                dialog.superDismiss();
+                                PrepareGameActivity.this.finish();
+                            }
+
+                            @Override
+                            public void onError(String msg) {
+                            }
+                        });
+                    }
+                });
+    }
+
+    private void showGameTimeOutCancelDialog(){
+        final NormalDialog dialog = new NormalDialog(PrepareGameActivity.this);
+        dialog.content("还有小伙伴没有加入到游戏，本局游戏自动解散。~")
+                .btnNum(1)
+                .btnText("确定")
+                .showAnim(new BounceTopEnter())
+                .dismissAnim(new SlideBottomExit())
+                .show();
+
+        dialog.setOnBtnClickL(new OnBtnClickL() {
+            @Override
+            public void onBtnClick() {
+                PrepareGameActivity.this.finish();
+                dialog.superDismiss();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        showGameCancelDialog();
     }
 
     @Override
@@ -220,5 +324,6 @@ public class PrepareGameActivity extends BaseActivity {
         super.onDestroy();
         mTimeCounter.cancel();
         RxBus.getInstance().unregister(this);
+        mSryxModel = null;
     }
 }

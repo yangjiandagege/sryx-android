@@ -23,6 +23,7 @@ public class SryxConfig {
     public class Key {
         public static final String CATEGORY_ID = "category_id";
         public static final String PAGE_ID = "page_id";
+        public static final String GAME_CODE = "game_code";
     }
 
     public static final List<Category> categoryList = new ArrayList<>();

@@ -43,8 +43,12 @@ import com.yj.sryx.common.Category;
 import com.yj.sryx.jpush.LocalAliasAndTags;
 import com.yj.sryx.manager.ActivityStackManager;
 import com.yj.sryx.manager.StatusBarUtil;
+import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.LoginModel;
 import com.yj.sryx.model.LoginModelImpl;
+import com.yj.sryx.model.SryxModel;
+import com.yj.sryx.model.SryxModelImpl;
+import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.utils.TransitionHelper;
 import com.yj.sryx.widget.CircleImageView;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
@@ -61,6 +65,7 @@ import cn.jpush.android.api.TagAliasCallback;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 import static com.yj.sryx.SryxApp.sWxApi;
+import static com.yj.sryx.SryxApp.sWxUser;
 
 public class MainActivity extends BaseActivity {
     @Bind(R.id.img_header)
@@ -79,12 +84,14 @@ public class MainActivity extends BaseActivity {
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient mClient;
+    private SryxModel mSryxModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mSryxModel = new SryxModelImpl(this);
         mLoginModel = new LoginModelImpl(this);
         initJpush();
         initLayout();
@@ -233,7 +240,7 @@ public class MainActivity extends BaseActivity {
                 });
                 break;
             case R.id.action_qrscan:
-                startActivity(new Intent(this, QrCodeScanActivity.class));
+                startActivityForResult(new Intent(this, QrCodeScanActivity.class),1);
                 break;
             case R.id.action_rule:
                 break;
@@ -274,6 +281,34 @@ public class MainActivity extends BaseActivity {
                         ActivityStackManager.getInstance().AppExit();
                     }
                 });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(data != null){
+            String gameCode = data.getExtras().getString(QrCodeScanActivity.QR_SCAN_RESULT);
+            ToastUtils.showLongToast(this, gameCode);
+            String[] strArray = gameCode.split("=");
+            String name = strArray[0];
+            String value = strArray[1];
+            switch (name){
+                case SryxConfig.Key.GAME_CODE:
+                    mSryxModel.joinGameByCode(value, sWxUser.getOpenid(), sWxUser.getNickname(), sWxUser.getHeadimgurl(), new SubscriberOnNextListener<String>() {
+                        @Override
+                        public void onSuccess(String roles) {
+
+                        }
+
+                        @Override
+                        public void onError(String msg) {
+                        }
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     /**
