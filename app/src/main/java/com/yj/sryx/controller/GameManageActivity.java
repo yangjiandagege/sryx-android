@@ -14,6 +14,7 @@ import com.flyco.animation.SlideExit.SlideBottomExit;
 import com.flyco.dialog.listener.OnBtnClickL;
 import com.flyco.dialog.widget.NormalDialog;
 import com.yj.sryx.R;
+import com.yj.sryx.common.GrayscaleTransformation;
 import com.yj.sryx.common.RecycleViewDivider;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
@@ -99,32 +100,58 @@ public class GameManageActivity extends BaseActivity {
     }
 
     private void setRoleItemView(ViewHolder holder, Role role, int position) {
-        if (role.getPlayerAvatarUrl() != null) {
-            Glide.with(GameManageActivity.this)
-                    .load(role.getPlayerAvatarUrl())
-                    .into((ImageView) holder.getView(R.id.iv_header));
-        } else {
-            holder.setImageResource(R.id.iv_header, R.mipmap.header_pic);
-        }
-        if (role.getPlayerNickName() != null) {
-            holder.setText(R.id.tv_nickname, role.getPlayerNickName());
-        }
+        holder.setText(R.id.tv_nickname, role.getPlayerNickName());
         holder.setText(R.id.tv_role, role.getRoleName());
         holder.getView(R.id.iv_kill_out).setOnClickListener(new VoteOrKillClickListener(position, role));
         holder.getView(R.id.iv_vote_out).setOnClickListener(new VoteOrKillClickListener(position, role));
         switch (role.getDeath()){
             case 0:
+                holder.setTextColor(R.id.tv_nickname, getResources().getColor(R.color.color_grey_800));
+                holder.setTextColor(R.id.tv_role, getResources().getColor(R.color.color_grey_800));
                 holder.setVisible(R.id.iv_kill_out, true);
                 holder.setVisible(R.id.iv_vote_out, true);
+                holder.setVisible(R.id.tv_death_state, false);
                 break;
             case 1:
+                holder.setTextColor(R.id.tv_nickname, getResources().getColor(R.color.color_grey_500));
+                holder.setTextColor(R.id.tv_role, getResources().getColor(R.color.color_grey_500));
                 holder.setVisible(R.id.iv_kill_out, false);
                 holder.setVisible(R.id.iv_vote_out, false);
+                holder.setVisible(R.id.tv_death_state, true);
+                holder.setText(R.id.tv_death_state, "死亡");
                 break;
             case 2:
+                holder.setTextColor(R.id.tv_nickname, getResources().getColor(R.color.color_grey_500));
+                holder.setTextColor(R.id.tv_role, getResources().getColor(R.color.color_grey_500));
                 holder.setVisible(R.id.iv_kill_out, false);
                 holder.setVisible(R.id.iv_vote_out, false);
+                holder.setVisible(R.id.tv_death_state, true);
+                holder.setText(R.id.tv_death_state, "出局");
                 break;
+        }
+        setRoleHeaderPic(role, holder);
+    }
+
+    private void setRoleHeaderPic(Role role, ViewHolder holder){
+        if (role.getPlayerAvatarUrl() != null) {
+            switch (role.getDeath()){
+                case 0:
+                    Glide.with(GameManageActivity.this)
+                            .load(role.getPlayerAvatarUrl())
+                            .into((ImageView) holder.getView(R.id.iv_header));
+                    break;
+                case 1:
+                case 2:
+                    Glide.with(GameManageActivity.this)
+                            .load(role.getPlayerAvatarUrl())
+                            .bitmapTransform(new GrayscaleTransformation(this))
+                            .into((ImageView) holder.getView(R.id.iv_header));
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            holder.setImageResource(R.id.iv_header, R.mipmap.header_pic);
         }
     }
 
@@ -178,31 +205,53 @@ public class GameManageActivity extends BaseActivity {
                 new OnBtnClickL() {
                     @Override
                     public void onBtnClick() {
-                        if(operateType == 0){
-                            mSryxModel.setRoleOut(1, role.getRoleId(), role.getGameId(), new SubscriberOnNextListener<String>() {
-                                @Override
-                                public void onSuccess(String s) {
-                                    getRolesInGame();
+                        mSryxModel.setRoleOut(operateType == 0?1:2, role.getRoleId(), role.getGameId(), new SubscriberOnNextListener<String>() {
+                            @Override
+                            public void onSuccess(String s) {
+                                if(!s.equals("continue")){
+                                    showResultDailog(s);
                                 }
+                                getRolesInGame();
+                            }
 
-                                @Override
-                                public void onError(String msg) {
-                                }
-                            });
-                        }else {
-                            mSryxModel.setRoleOut(2, role.getRoleId(), role.getGameId(), new SubscriberOnNextListener<String>() {
-                                @Override
-                                public void onSuccess(String s) {
-                                    getRolesInGame();
-                                }
-
-                                @Override
-                                public void onError(String msg) {
-                                }
-                            });
-                        }
+                            @Override
+                            public void onError(String msg) {
+                            }
+                        });
+                        dialog.dismiss();
                     }
                 });
+    }
+
+    private void showResultDailog(String result) {
+        String resultContent = null;
+        switch (result){
+            case "0":
+                resultContent = "警察全部死亡，杀手集团获得胜利！";
+                break;
+            case "1":
+                resultContent = "杀手全部死亡，正义联盟获得胜利！";
+                break;
+            case "2":
+                resultContent = "平民全部死亡，双方平局！";
+                break;
+        }
+        final NormalDialog dialog = new NormalDialog(this);
+        dialog.content(resultContent)
+                .title("比赛结束")
+                .btnNum(1)
+                .btnText("好的")
+                .showAnim(new BounceTopEnter())
+                .dismissAnim(new SlideBottomExit())
+                .show();
+
+        dialog.setOnBtnClickL(new OnBtnClickL() {
+            @Override
+            public void onBtnClick() {
+                finish();
+                dialog.superDismiss();
+            }
+        });
     }
 
     private void getRolesInGame() {

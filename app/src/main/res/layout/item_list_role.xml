@@ -30,15 +30,30 @@
     </LinearLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_death_state"
+            android:layout_width="86dp"
+            android:layout_height="32dp"
+            android:background="@drawable/death_label_bg"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:rotation="20"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:textColor="@color/color_grey_500"
+            android:visibility="invisible"/>
+
         <ImageView
             android:id="@+id/iv_kill_out"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_marginRight="16dp"
-            android:layout_gravity="center_vertical"
             android:src="@mipmap/kill_out"/>
         <ImageView
             android:id="@+id/iv_vote_out"
@@ -46,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/iv_kill_out"
             android:layout_marginRight="20dp"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:src="@mipmap/vote_out"/>
     </RelativeLayout>
 </LinearLayout>
