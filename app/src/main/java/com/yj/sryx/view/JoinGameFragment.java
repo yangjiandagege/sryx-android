@@ -58,11 +58,12 @@ public class JoinGameFragment extends Fragment {
         return view;
     }
 
-    private void joinGameByCode(String gameCode) {
+    private void joinGameByCode(final String gameCode) {
         mSryxModel.joinGameByCode(gameCode, sWxUser.getOpenid(), sWxUser.getNickname(), sWxUser.getHeadimgurl(), new SubscriberOnNextListener<String>() {
             @Override
             public void onSuccess(String roles) {
                 Intent intent = new Intent(mActivity, MyRoleActivity.class);
+                intent.putExtra(MyRoleActivity.GAME_CODE, gameCode);
                 startActivity(intent);
             }
 

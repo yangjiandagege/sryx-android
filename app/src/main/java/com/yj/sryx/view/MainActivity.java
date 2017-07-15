@@ -262,8 +262,7 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
-            String gameCode = data.getExtras().getString(QrCodeScanActivity.QR_SCAN_RESULT);
-            ToastUtils.showLongToast(this, gameCode);
+            final String gameCode = data.getExtras().getString(QrCodeScanActivity.QR_SCAN_RESULT);
             final String[] strArray = gameCode.split("=");
             String name = strArray[0];
             String value = strArray[1];
@@ -273,6 +272,7 @@ public class MainActivity extends BaseActivity {
                         @Override
                         public void onSuccess(String roles) {
                             Intent intent = new Intent(MainActivity.this, MyRoleActivity.class);
+                            intent.putExtra(MyRoleActivity.GAME_CODE, gameCode);
                             startActivity(intent);
                         }
 

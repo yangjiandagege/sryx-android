@@ -90,6 +90,23 @@ public class SryxModelImpl implements SryxModel {
     }
 
     @Override
+    public void getRoleByCode(String gameCode, final String playerId, SubscriberOnNextListener<Role> callback) {
+        mService.getGameByInviteCode(gameCode)
+                .map(new HttpResultFunc<Game>())
+                .flatMap(new Func1<Game, Observable<HttpResult<Role>>>() {
+                    @Override
+                    public Observable<HttpResult<Role>> call(Game result) {
+                        return mService.getMyRoleInGame(playerId, result.getGameId());
+                    }
+                })
+                .map(new HttpResultFunc<Role>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    @Override
     public void cancleGame(Integer gameId, SubscriberOnNextListener<String> callback) {
         mService.cancleGame(3, gameId)
                 .map(new HttpResultFunc<String>())
