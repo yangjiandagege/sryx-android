@@ -1,10 +1,13 @@
 package com.yj.sryx.manager.httpRequest.progress;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
+
+import com.yj.sryx.widget.SryxProgressDialog;
 
 /**
  * Created by eason.yang on 2017/7/10.
@@ -14,7 +17,7 @@ public class ProgressDialogHandler extends Handler {
     public static final int SHOW_PROGRESS_DIALOG = 1;
     public static final int DISMISS_PROGRESS_DIALOG = 2;
 
-    private ProgressDialog pd;
+    private Dialog pd;
 
     private Context context;
     private boolean cancelable;
@@ -30,7 +33,7 @@ public class ProgressDialogHandler extends Handler {
 
     private void initProgressDialog(){
         if (pd == null) {
-            pd = new ProgressDialog(context);
+            pd = SryxProgressDialog.createLoadingDialog(context, "正在加载中...");
 
             pd.setCancelable(cancelable);
 

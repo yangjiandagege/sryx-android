@@ -22,13 +22,20 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
 
     private SubscriberOnNextListener mSubscriberOnNextListener;
     private ProgressDialogHandler mProgressDialogHandler;
+    private Context mContext;
+    private boolean mIsPdShow = true;
 
-    private Context context;
+    public ProgressSubscriber(SubscriberOnNextListener subscriberOnNextListener, Context context) {
+        this.mSubscriberOnNextListener = subscriberOnNextListener;
+        this.mContext = context;
+        this.mProgressDialogHandler = new ProgressDialogHandler(context, this, true);
+    }
 
-    public ProgressSubscriber(SubscriberOnNextListener mSubscriberOnNextListener, Context context) {
-        this.mSubscriberOnNextListener = mSubscriberOnNextListener;
-        this.context = context;
-        mProgressDialogHandler = new ProgressDialogHandler(context, this, true);
+    public ProgressSubscriber(SubscriberOnNextListener subscriberOnNextListener, Context context, boolean isPdShow) {
+        this.mSubscriberOnNextListener = subscriberOnNextListener;
+        this.mContext = context;
+        this.mProgressDialogHandler = new ProgressDialogHandler(context, this, true);
+        this.mIsPdShow = isPdShow;
     }
 
     private void showProgressDialog(){
@@ -50,7 +57,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
      */
     @Override
     public void onStart() {
-        showProgressDialog();
+        if(mIsPdShow) {
+            showProgressDialog();
+        }
     }
 
     /**
@@ -58,7 +67,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
      */
     @Override
     public void onCompleted() {
-        dismissProgressDialog();
+        if(mIsPdShow) {
+            dismissProgressDialog();
+        }
     }
 
     /**
@@ -69,11 +80,11 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     @Override
     public void onError(Throwable e) {
         if (e instanceof SocketTimeoutException) {
-            Toast.makeText(context, "网络中断，请检查您的网络状态", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "网络中断，请检查您的网络状态", Toast.LENGTH_SHORT).show();
         } else if (e instanceof ConnectException) {
-            Toast.makeText(context, "网络中断，请检查您的网络状态", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "网络中断，请检查您的网络状态", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(context, "error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         dismissProgressDialog();
         if (mSubscriberOnNextListener != null) {
