@@ -32,19 +32,16 @@ import butterknife.ButterKnife;
 public class QuizActivity extends BaseActivity {
     @Bind(R.id.toolbar)
     public AcceBar toolbar;
-    @Bind(R.id.fg_container)
-    FrameLayout fgContainer;
 
-    private Category mCategory;
-    private Fragment mFragment;
-    private String fragmentTag;
+    private String mFragName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        mFragName = getIntent().getExtras().getString(SryxConfig.Key.CATEGORY_ID);
+        setTheme(SryxApp.sActivityThemeMap.get(mFragName).getStyleId());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
         ButterKnife.bind(this);
-        initData();
         initLayoutView();
     }
 
@@ -56,28 +53,9 @@ public class QuizActivity extends BaseActivity {
         }
     }
 
-    private void initData() {
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            mCategory = SryxConfig.categoryList.get(bundle.getInt(SryxConfig.Key.CATEGORY_ID));
-        }
-        SryxApp.currentThemeId = mCategory.getTheme().getStyleId();
-        SryxApp.toolbarTextColor = ContextCompat.getColor(this,
-                mCategory.getTheme().getTextPrimaryColor());
-    }
-
     private void initLayoutView() {
-        setTheme(SryxApp.currentThemeId);
-        if (ApiLevelHelper.isAtLeast(Build.VERSION_CODES.LOLLIPOP)) {
-            Window window = getWindow();
-            window.setStatusBarColor(ContextCompat.getColor(this,
-                    mCategory.getTheme().getPrimaryDarkColor()));
-        }
         setContentView(R.layout.activity_quiz);
         ButterKnife.bind(this);
-        fgContainer.setBackgroundColor(ContextCompat.
-                getColor(this, mCategory.getTheme().getWindowBackgroundColor()));
-        toolbar.setTitleText(mCategory.getName());
         int categoryNameTextSize = getResources()
                 .getDimensionPixelSize(R.dimen.category_item_text_size);
         int paddingStart = getResources().getDimensionPixelSize(R.dimen.spacing_double);
@@ -111,47 +89,24 @@ public class QuizActivity extends BaseActivity {
                     }
                 });
 
-        findFragment();
         initFragment();
     }
 
-    private void findFragment() {
-        switch (mCategory.getId()) {
-            case SryxConfig.ID_0:
-                newFragmentAc0();
-                break;
-            case SryxConfig.ID_1:
-                newFragmentAc1();
-                break;
-            case SryxConfig.ID_2:
-                newFragmentAc2();
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void newFragmentAc0(){
-        fragmentTag = "id_0";
-        mFragment = new CreateGameFragment();
-    }
-
-    public void newFragmentAc1(){
-        fragmentTag = "id_1";
-        mFragment = new JoinGameFragment();
-    }
-
-    public void newFragmentAc2(){
-        fragmentTag = "id_2";
-        mFragment = new GameRecordsFragment();
-    }
-
     private void initFragment() {
-        if (mFragment != null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fg_container, mFragment, fragmentTag)
-                    .commit();
+        Fragment fragment;
+        if(mFragName.equals(CreateGameFragment.class.getSimpleName())){
+            fragment = new CreateGameFragment();
+            toolbar.setTitleText("创建游戏");
+        }else if(mFragName.equals(JoinGameFragment.class.getSimpleName())){
+            fragment = new JoinGameFragment();
+            toolbar.setTitleText("加入游戏");
+        }else {
+            fragment = new GameRecordsFragment();
+            toolbar.setTitleText("我的记录");
         }
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fg_container, fragment)
+                .commit();
     }
 }

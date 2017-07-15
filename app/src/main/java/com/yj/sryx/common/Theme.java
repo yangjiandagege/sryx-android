@@ -32,9 +32,6 @@ import com.yj.sryx.R;
  * in an adapter backed view without recycling.
  */
 public enum Theme {
-    orange(R.color.theme_orange_primary, R.color.theme_orange_primary_dark,
-            R.color.theme_orange_background, R.color.theme_orange_text,
-            R.color.theme_orange_accent, R.style.AppTheme_Orange),
     blue(R.color.theme_blue_primary, R.color.theme_blue_primary_dark,
             R.color.theme_blue_background, R.color.theme_blue_text,
             R.color.theme_blue_accent, R.style.AppTheme_Blue),

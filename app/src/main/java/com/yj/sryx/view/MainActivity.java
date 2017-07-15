@@ -84,11 +84,7 @@ public class MainActivity extends BaseActivity {
 
     private LoginModel mLoginModel;
     private static final int MSG_SET_ALIAS = 1001;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient mClient;
+
     private SryxModel mSryxModel;
 
     @Override
@@ -100,15 +96,6 @@ public class MainActivity extends BaseActivity {
         mLoginModel = new LoginModelImpl(this);
         initJpush();
         initLayout();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        mClient = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setTheme(SryxApp.sActivityThemeMap.get(MainActivity.class));
     }
 
     private void initJpush() {
@@ -163,7 +150,7 @@ public class MainActivity extends BaseActivity {
         tvNickname.setText(SryxApp.sWxUser.getNickname());
     }
 
-    private void startQuizActivityWithTransition(Activity activity, View toolbar, int id) {
+    private void startQuizActivityWithTransition(Activity activity, View toolbar, String id) {
         final Pair[] pairs = TransitionHelper.createSafeTransitionParticipants(activity, false,
                 new Pair<>(toolbar, activity.getString(R.string.transition_toolbar)));
         @SuppressWarnings("unchecked")
@@ -300,53 +287,17 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Main Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        mClient.connect();
-        AppIndex.AppIndexApi.start(mClient, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(mClient, getIndexApiAction());
-        mClient.disconnect();
-    }
-
     @OnClick({R.id.rl_create_game, R.id.rl_join_game, R.id.rl_my_record})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rl_create_game:
-                startQuizActivityWithTransition(MainActivity.this, tvCreateGame, SryxConfig.categoryList.get(0).getId());
+                startQuizActivityWithTransition(MainActivity.this, tvCreateGame, CreateGameFragment.class.getSimpleName());
                 break;
             case R.id.rl_join_game:
-                startQuizActivityWithTransition(MainActivity.this, tvJoinGame, SryxConfig.categoryList.get(1).getId());
+                startQuizActivityWithTransition(MainActivity.this, tvJoinGame, JoinGameFragment.class.getSimpleName());
                 break;
             case R.id.rl_my_record:
-                startQuizActivityWithTransition(MainActivity.this, tvMyRecord, SryxConfig.categoryList.get(2).getId());
+                startQuizActivityWithTransition(MainActivity.this, tvMyRecord, GameRecordsFragment.class.getSimpleName());
                 break;
         }
     }

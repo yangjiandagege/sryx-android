@@ -90,17 +90,17 @@ public class AcceBar extends LinearLayout {
             tvManagement.setText(mManagement);
         }
 
-        if (SryxApp.toolbarTextColor != 0) {  //表示使用自定义toolbar字体颜色
-            tvTitle.setTextColor(SryxApp.toolbarTextColor);
-            tvManagement.setTextColor(SryxApp.toolbarTextColor);
-            PorterDuffColorFilter filter = new PorterDuffColorFilter(SryxApp.toolbarTextColor, SRC_IN);
-            Drawable drawableBack = getResources().getDrawable(R.mipmap.ic_arrow_back_black);
-            drawableBack.setColorFilter(filter);
-            ivPressBack.setImageDrawable(drawableBack);
-            Drawable drawableSearch = getResources().getDrawable(R.mipmap.search_toolbar);
-            drawableSearch.setColorFilter(filter);
-            ivSearch.setImageDrawable(drawableSearch);
-        }
+//        if (SryxApp.toolbarTextColor != 0) {  //表示使用自定义toolbar字体颜色
+//            tvTitle.setTextColor(SryxApp.toolbarTextColor);
+//            tvManagement.setTextColor(SryxApp.toolbarTextColor);
+//            PorterDuffColorFilter filter = new PorterDuffColorFilter(SryxApp.toolbarTextColor, SRC_IN);
+//            Drawable drawableBack = getResources().getDrawable(R.mipmap.ic_arrow_back_black);
+//            drawableBack.setColorFilter(filter);
+//            ivPressBack.setImageDrawable(drawableBack);
+//            Drawable drawableSearch = getResources().getDrawable(R.mipmap.search_toolbar);
+//            drawableSearch.setColorFilter(filter);
+//            ivSearch.setImageDrawable(drawableSearch);
+//        }
 
         ivPressBack.setOnClickListener(new OnClickListener() {
             @Override

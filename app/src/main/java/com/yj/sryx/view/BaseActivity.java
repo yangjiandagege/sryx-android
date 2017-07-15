@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.ActivityStackManager;
+import com.yj.sryx.utils.LogUtils;
+import com.yj.sryx.utils.ToastUtils;
 import com.zhy.autolayout.AutoFrameLayout;
 import com.zhy.autolayout.AutoLinearLayout;
 import com.zhy.autolayout.AutoRelativeLayout;
@@ -25,10 +28,10 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (SryxApp.currentThemeId != 0) {
-            setTheme(SryxApp.currentThemeId);
+        if(null != SryxApp.sActivityThemeMap.get(this.getClass().getSimpleName())){
+            setTheme(SryxApp.sActivityThemeMap.get(this.getClass().getSimpleName()).getStyleId());
         }
+        super.onCreate(savedInstanceState);
         //Activity栈管理，启动时添加到栈中
         ActivityStackManager.getInstance().addActivity(this);
     }

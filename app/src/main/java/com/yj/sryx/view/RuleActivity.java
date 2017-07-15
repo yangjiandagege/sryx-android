@@ -10,6 +10,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.yj.sryx.R;
+import com.yj.sryx.SryxApp;
+import com.yj.sryx.utils.LogUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -24,6 +26,7 @@ public class RuleActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(SryxApp.sActivityThemeMap.get(this.getClass().getSimpleName()).getStyleId());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rule);
         ButterKnife.bind(this);
@@ -52,7 +55,7 @@ public class RuleActivity extends BaseActivity {
         webSettings.setLoadsImagesAutomatically(true); //支持自动加载图片
         webSettings.setDefaultTextEncodingName("utf-8");//设置编码格式
 
-        wvGameRule.loadUrl("http://www.baidu.com/");
+        wvGameRule.loadUrl("https://www.ywwxmm.cn/");
 
         //设置不用系统浏览器打开,直接显示在当前Webview
         wvGameRule.setWebViewClient(new WebViewClient() {

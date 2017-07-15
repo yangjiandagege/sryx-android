@@ -39,7 +39,7 @@
                 android:layout_centerInParent="true"
                 android:textSize="@dimen/toolbar_title_size"
                 android:transitionName="@string/transition_toolbar"
-                android:textColor="@color/text_dark"
+                android:textColor="@color/text_light"
                 tools:targetApi="lollipop"
                 android:text="创建游戏"/>
         </RelativeLayout>
