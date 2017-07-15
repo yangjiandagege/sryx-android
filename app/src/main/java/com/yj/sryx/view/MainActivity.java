@@ -98,6 +98,12 @@ public class MainActivity extends BaseActivity {
         mClient = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setTheme(SryxApp.sActivityThemeMap.get(MainActivity.class));
+    }
+
     private void initJpush() {
         String alias = SryxApp.sWxUser.getOpenid();
         Set<String> tags = new HashSet<>();
@@ -143,6 +149,7 @@ public class MainActivity extends BaseActivity {
         StatusBarUtil.StatusBarLightMode(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         Glide.with(this)
                 .load(SryxApp.sWxUser.getHeadimgurl())
                 .into(imgHeader);
@@ -241,6 +248,7 @@ public class MainActivity extends BaseActivity {
                 startActivityForResult(new Intent(this, QrCodeScanActivity.class),1);
                 break;
             case R.id.action_rule:
+                startActivity(new Intent(this, RuleActivity.class));
                 break;
             case R.id.action_exit:
                 mLoginModel.exitWxLogin();
@@ -287,7 +295,7 @@ public class MainActivity extends BaseActivity {
         if(data != null){
             String gameCode = data.getExtras().getString(QrCodeScanActivity.QR_SCAN_RESULT);
             ToastUtils.showLongToast(this, gameCode);
-            String[] strArray = gameCode.split("=");
+            final String[] strArray = gameCode.split("=");
             String name = strArray[0];
             String value = strArray[1];
             switch (name){
@@ -295,7 +303,8 @@ public class MainActivity extends BaseActivity {
                     mSryxModel.joinGameByCode(value, sWxUser.getOpenid(), sWxUser.getNickname(), sWxUser.getHeadimgurl(), new SubscriberOnNextListener<String>() {
                         @Override
                         public void onSuccess(String roles) {
-
+                            Intent intent = new Intent(MainActivity.this, MyRoleActivity.class);
+                            startActivity(intent);
                         }
 
                         @Override

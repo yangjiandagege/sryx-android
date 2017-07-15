@@ -14,8 +14,40 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textColor="@color/color_white"
         android:orientation="vertical"
         android:background="@drawable/game_detail_gradlient_bg">
+
+        <TextView
+            android:id="@+id/tv_game_config"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32px"
+            android:layout_marginRight="32px"
+            android:layout_marginBottom="20px"
+            android:textColor="@color/color_white"
+            tools:text="游戏配置：1警1匪2平民"/>
+
+        <TextView
+            android:id="@+id/tv_game_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32px"
+            android:layout_marginRight="32px"
+            android:layout_marginBottom="20px"
+            android:textColor="@color/color_white"
+            tools:text="游戏结果：正义联盟获胜"/>
+
+        <TextView
+            android:id="@+id/tv_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32px"
+            android:layout_marginRight="32px"
+            android:layout_marginBottom="20px"
+            android:textColor="@color/color_white"
+            tools:text="游戏时间：2017年07月15日 18:20~18:40"/>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

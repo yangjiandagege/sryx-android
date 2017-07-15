@@ -2,11 +2,17 @@ package com.yj.sryx;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.yj.sryx.common.Category;
+import com.yj.sryx.common.Theme;
 import com.yj.sryx.model.beans.WxUser;
+import com.yj.sryx.view.MainActivity;
 import com.zhy.autolayout.config.AutoLayoutConifg;
+
+import java.util.HashMap;
 
 import cn.jpush.android.api.JPushInterface;
 
@@ -17,6 +23,8 @@ public class SryxApp extends Application {
     public static Context sContext;
     public static IWXAPI sWxApi;
     public static WxUser sWxUser;
+    public static HashMap<Object, Integer> sActivityThemeMap;
+
     public static        int                   currentThemeId   = 0;
     public static        int                   toolbarTextColor = 0;
     @Override
@@ -29,6 +37,13 @@ public class SryxApp extends Application {
         initAutoLayout();
         //初始化微信API
         initWxApi();
+        //初始化主题map
+        initThemeMap();
+    }
+
+    private void initThemeMap() {
+        sActivityThemeMap = new HashMap<>();
+        sActivityThemeMap.put(MainActivity.class, R.style.AppTheme_Yellow);
     }
 
     private void initJpush() {

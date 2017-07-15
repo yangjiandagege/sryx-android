@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.yj.sryx.R;
@@ -13,6 +14,7 @@ import com.yj.sryx.common.RecycleViewDivider;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
+import com.yj.sryx.model.beans.Game;
 import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
 import com.yj.sryx.widget.adapterrv.ViewHolder;
@@ -33,6 +35,12 @@ public class GameDetailActivity extends BaseActivity {
     RecyclerView rvListRolesJustice;
     @Bind(R.id.rv_list_roles_evil)
     RecyclerView rvListRolesEvil;
+    @Bind(R.id.tv_game_config)
+    TextView tvGameConfig;
+    @Bind(R.id.tv_game_result)
+    TextView tvGameResult;
+    @Bind(R.id.tv_duration)
+    TextView tvDuration;
 
     private int mGameId;
     private SryxModel mSryxModel;
@@ -79,7 +87,7 @@ public class GameDetailActivity extends BaseActivity {
         holder.setText(R.id.tv_role, role.getRoleName());
         holder.setVisible(R.id.iv_kill_out, false);
         holder.setVisible(R.id.iv_vote_out, false);
-        switch (role.getDeath()){
+        switch (role.getDeath()) {
             case 0:
                 holder.setTextColor(R.id.tv_nickname, getResources().getColor(R.color.color_grey_800));
                 holder.setTextColor(R.id.tv_role, getResources().getColor(R.color.color_grey_800));
@@ -101,9 +109,9 @@ public class GameDetailActivity extends BaseActivity {
         setRoleHeaderPic(role, holder);
     }
 
-    private void setRoleHeaderPic(Role role, ViewHolder holder){
+    private void setRoleHeaderPic(Role role, ViewHolder holder) {
         if (role.getPlayerAvatarUrl() != null) {
-            switch (role.getDeath()){
+            switch (role.getDeath()) {
                 case 0:
                     Glide.with(GameDetailActivity.this)
                             .load(role.getPlayerAvatarUrl())
@@ -145,6 +153,19 @@ public class GameDetailActivity extends BaseActivity {
                 }
                 mEvilAdapter.notifyDataSetChanged();
                 mJusticeAdapter.notifyDataSetChanged();
+
+                tvGameConfig.setText("游戏配置："+roles.get(0).getRemark());
+                tvGameResult.setText("游戏结果："+roles.get(0).getGameResult());
+            }
+
+            @Override
+            public void onError(String msg) {
+            }
+        });
+        mSryxModel.getGameById(String.valueOf(mGameId), new SubscriberOnNextListener<Game>() {
+            @Override
+            public void onSuccess(Game game) {
+                tvDuration.setText("游戏时间："+game.getGameDate()+" "+game.getStartTime()+" ~ "+game.getEndTime());
             }
 
             @Override

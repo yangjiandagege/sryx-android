@@ -46,6 +46,23 @@ public class Role implements Serializable{
 		}
 		return roleName;
 	}
+
+    public String getGameResult(){
+        String gameResult = null;
+        switch(victorySide){
+            case 0:
+                gameResult = "杀手集团获胜";
+                break;
+            case 1:
+                gameResult = "正义联盟获胜";
+                break;
+            case 2:
+                gameResult = "平局";
+                break;
+        }
+        return gameResult;
+    }
+
 	public Integer getRoleId() {
 		return roleId;
 	}

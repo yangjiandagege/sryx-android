@@ -1,5 +1,7 @@
 package com.yj.sryx.model.beans;
 
+import com.yj.sryx.utils.DateUtils;
+
 import java.io.Serializable;
 
 public class Game implements Serializable{
@@ -18,7 +20,7 @@ public class Game implements Serializable{
 	private String	endTime;
 	private Integer result;
 	private String 	createTime;
-	
+
 	public Integer getGameId() {
 		return gameId;
 	}
@@ -102,6 +104,9 @@ public class Game implements Serializable{
 		return state;
 	}
 
+    public String getGameDate(){
+        return DateUtils.convertTimeFormat(startTime, "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd");
+    }
 
 	public void setState(Integer state) {
 		this.state = state;
@@ -109,7 +114,7 @@ public class Game implements Serializable{
 
 
 	public String getStartTime() {
-		return startTime;
+        return DateUtils.convertTimeFormat(startTime, "yyyy-MM-dd HH:mm:ss.S", "HH:mm");
 	}
 
 
@@ -119,7 +124,7 @@ public class Game implements Serializable{
 
 
 	public String getEndTime() {
-		return endTime;
+        return DateUtils.convertTimeFormat(endTime, "yyyy-MM-dd HH:mm:ss.S", "HH:mm");
 	}
 
 

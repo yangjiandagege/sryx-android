@@ -4,7 +4,7 @@
     android:id="@+id/acce_toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="?colorPrimary"
+    android:background="@color/theme_yellow_background"
     app:theme="@style/AppTheme.ToolbarBlack"
     app:contentInsetLeft="0dp"
     app:contentInsetStart="0dp"
