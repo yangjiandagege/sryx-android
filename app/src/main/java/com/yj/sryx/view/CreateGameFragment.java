@@ -1,4 +1,4 @@
-package com.yj.sryx.controller;
+package com.yj.sryx.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,6 @@ import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.utils.LogUtils;
-import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.widget.AmountView;
 
 import butterknife.Bind;

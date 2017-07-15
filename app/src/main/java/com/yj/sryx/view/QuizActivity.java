@@ -1,4 +1,4 @@
-package com.yj.sryx.controller;
+package com.yj.sryx.view;
 
 import android.content.Intent;
 import android.os.Build;
@@ -143,7 +143,7 @@ public class QuizActivity extends BaseActivity {
 
     public void newFragmentAc2(){
         fragmentTag = "id_2";
-        mFragment = new GameRecordFragment();
+        mFragment = new GameRecordsFragment();
     }
 
     private void initFragment() {

@@ -1,4 +1,4 @@
-package com.yj.sryx.controller;
+package com.yj.sryx.view;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.util.Util;
 import com.flyco.animation.BounceEnter.BounceTopEnter;
 import com.flyco.animation.SlideExit.SlideBottomExit;
 import com.flyco.dialog.listener.OnBtnClickL;
@@ -63,7 +62,6 @@ import butterknife.ButterKnife;
 import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 import static com.yj.sryx.SryxApp.sWxApi;
 import static com.yj.sryx.SryxApp.sWxUser;
 

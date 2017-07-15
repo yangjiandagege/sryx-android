@@ -1,13 +1,10 @@
-package com.yj.sryx.controller;
+package com.yj.sryx.view;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 import android.view.View;
 
 import com.yj.sryx.SryxApp;

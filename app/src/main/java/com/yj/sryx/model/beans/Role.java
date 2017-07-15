@@ -1,5 +1,8 @@
 package com.yj.sryx.model.beans;
 
+import com.yj.sryx.utils.DateUtils;
+import com.yj.sryx.utils.TimeUtils;
+
 import java.io.Serializable;
 
 public class Role implements Serializable{
@@ -16,6 +19,14 @@ public class Role implements Serializable{
     private String 	deathTime;
     private String 	createTime;
     private String 	remark;
+
+	public String getDate(){
+        return DateUtils.convertTimeFormat(createTime, "yy-MM-dd HH:mm:ss.S", "MM月dd日");
+    }
+
+    public String getTime() {
+        return DateUtils.convertTimeFormat(createTime, "yy-MM-dd HH:mm:ss.S", "HH:mm");
+    }
 
 	public String getRoleName() {
 		String roleName = null;

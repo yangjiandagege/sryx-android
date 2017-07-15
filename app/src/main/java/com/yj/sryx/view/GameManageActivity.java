@@ -1,4 +1,4 @@
-package com.yj.sryx.controller;
+package com.yj.sryx.view;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -237,6 +237,7 @@ public class GameManageActivity extends BaseActivity {
                 break;
         }
         final NormalDialog dialog = new NormalDialog(this);
+        dialog.setCanceledOnTouchOutside(true);
         dialog.content(resultContent)
                 .title("比赛结束")
                 .btnNum(1)

@@ -31,4 +31,6 @@ public interface SryxModel {
     void cancleGame(Integer gameId, SubscriberOnNextListener<String> callback);
 
     void setRoleOut(Integer death, Integer roleId, Integer gameId, SubscriberOnNextListener<String> callback);
+
+    void getMyGameRecordList(String playerId, SubscriberOnNextListener<List<Role>> callback);
 }

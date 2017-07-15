@@ -1,4 +1,4 @@
-package com.yj.sryx.controller;
+package com.yj.sryx.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,13 +14,10 @@ import com.yj.sryx.SryxConfig;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
-import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.widget.MultiEditText;
 import com.yj.sryx.widget.virtualKeyboard.OnTextInputListener;
 import com.yj.sryx.widget.virtualKeyboard.VirtualKeyboardView;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

@@ -63,4 +63,10 @@ public interface SryxService {
             @Query("death") Integer state,
             @Query("roleId") Integer roleId,
             @Query("gameId") Integer gameId);
+
+    @GET("sryx/getmygamerecords")
+    Observable<HttpResult<List<Role>>> getMyGameRecordList(
+            @Query("playerId") String playerId);
+
+
 }

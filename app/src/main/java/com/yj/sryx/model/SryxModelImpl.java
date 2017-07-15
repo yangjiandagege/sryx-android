@@ -109,6 +109,16 @@ public class SryxModelImpl implements SryxModel {
                 .subscribe(new ProgressSubscriber(callback, mContext));
     }
 
+    @Override
+    public void getMyGameRecordList(String playerId, SubscriberOnNextListener<List<Role>> callback) {
+        mService.getMyGameRecordList(playerId)
+                .map(new HttpResultFunc<List<Role>>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
     /**
      * 创建游戏
      * @param gameOwnerId
@@ -134,6 +144,5 @@ public class SryxModelImpl implements SryxModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new ProgressSubscriber(callback, mContext));
     }
-
 
 }

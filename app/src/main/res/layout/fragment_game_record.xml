@@ -3,5 +3,14 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-
+    <com.tonicartos.widget.stickygridheaders.StickyGridHeadersGridView
+        android:id="@+id/hg_record_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:numColumns="1"
+        android:scrollbars="none"
+        android:paddingRight="32px"
+        android:paddingLeft="32px"
+        android:verticalSpacing="32px" />
 </LinearLayout>

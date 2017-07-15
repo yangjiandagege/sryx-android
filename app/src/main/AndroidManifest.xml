@@ -48,26 +48,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".controller.SplashActivity"
+        <activity android:name=".view.SplashActivity"
                   android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".controller.MainActivity"
+        <activity android:name=".view.MainActivity"
                   android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".controller.PrepareGameActivity"
+        <activity android:name=".view.PrepareGameActivity"
                   android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".controller.GameManageActivity"
+        <activity android:name=".view.GameManageActivity"
                   android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".controller.QuizActivity"
+        <activity android:name=".view.QuizActivity"
                   android:theme="@style/AppTheme.QuizActivity"
                   android:screenOrientation="portrait"/>
-        <activity android:name=".controller.QrCodeScanActivity"
+        <activity android:name=".view.QrCodeScanActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".view.GameDetailActivity"
                   android:screenOrientation="portrait"/>
         <activity
             android:name=".wxapi.WXEntryActivity"

@@ -1,4 +1,4 @@
-package com.yj.sryx.controller;
+package com.yj.sryx.view;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,12 +19,10 @@ import com.bumptech.glide.Glide;
 import com.flyco.animation.BounceEnter.BounceTopEnter;
 import com.flyco.animation.SlideExit.SlideBottomExit;
 import com.flyco.dialog.listener.OnBtnClickL;
-import com.flyco.dialog.widget.MaterialDialog;
 import com.flyco.dialog.widget.NormalDialog;
 import com.yj.sryx.R;
 import com.yj.sryx.SryxConfig;
 import com.yj.sryx.common.RecycleViewDivider;
-import com.yj.sryx.manager.ActivityStackManager;
 import com.yj.sryx.manager.RxBus;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
@@ -49,10 +47,6 @@ import butterknife.OnClick;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-import static com.yj.sryx.SryxApp.sWxUser;
 
 /**
  * Created by eason.yang on 2017/7/11.
