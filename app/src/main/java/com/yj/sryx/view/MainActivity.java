@@ -12,13 +12,12 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -38,7 +37,6 @@ import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.SryxConfig;
-import com.yj.sryx.common.Category;
 import com.yj.sryx.jpush.LocalAliasAndTags;
 import com.yj.sryx.manager.ActivityStackManager;
 import com.yj.sryx.manager.StatusBarUtil;
@@ -50,8 +48,6 @@ import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.utils.TransitionHelper;
 import com.yj.sryx.widget.CircleImageView;
-import com.yj.sryx.widget.adapterrv.CommonAdapter;
-import com.yj.sryx.widget.adapterrv.ViewHolder;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
@@ -59,6 +55,7 @@ import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
 
@@ -70,10 +67,20 @@ public class MainActivity extends BaseActivity {
     CircleImageView imgHeader;
     @Bind(R.id.tv_nickname)
     TextView tvNickname;
-    @Bind(R.id.categories_rv)
-    RecyclerView categoriesRv;
     @Bind(R.id.acce_toolbar)
     Toolbar toolbar;
+    @Bind(R.id.rl_create_game)
+    RelativeLayout rlCreateGame;
+    @Bind(R.id.rl_join_game)
+    RelativeLayout rlJoinGame;
+    @Bind(R.id.rl_my_record)
+    RelativeLayout rlMyRecord;
+    @Bind(R.id.tv_create_game)
+    TextView tvCreateGame;
+    @Bind(R.id.tv_join_game)
+    TextView tvJoinGame;
+    @Bind(R.id.tv_my_record)
+    TextView tvMyRecord;
 
     private LoginModel mLoginModel;
     private static final int MSG_SET_ALIAS = 1001;
@@ -154,32 +161,6 @@ public class MainActivity extends BaseActivity {
                 .load(SryxApp.sWxUser.getHeadimgurl())
                 .into(imgHeader);
         tvNickname.setText(SryxApp.sWxUser.getNickname());
-
-        //设置内容
-        categoriesRv.setAdapter(new CommonAdapter<Category>(this, R.layout.item_category_simple, SryxConfig.categoryList) {
-            @Override
-            protected void convert(final ViewHolder holder, final Category category, int position) {
-                holder.setText(R.id.tv_category_title, category.getName());
-                holder.setTextColor(R.id.tv_category_title, getResources().getColor(category.getTheme().getTextPrimaryColor()));
-                holder.setBackgroundColor(R.id.rl_category, getResources().getColor(category.getTheme().getPrimaryColor()));
-                holder.setOnClickListener(R.id.rl_category, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startQuizActivityWithTransition(MainActivity.this, holder.getView(R.id.tv_category_title), category.getId());
-                    }
-                });
-            }
-        });
-
-        categoriesRv.getViewTreeObserver()
-                .addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                    @Override
-                    public boolean onPreDraw() {
-                        categoriesRv.getViewTreeObserver().removeOnPreDrawListener(this);
-                        MainActivity.this.supportStartPostponedEnterTransition();
-                        return true;
-                    }
-                });
     }
 
     private void startQuizActivityWithTransition(Activity activity, View toolbar, int id) {
@@ -202,21 +183,22 @@ public class MainActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-    public static byte[] bmpToByteArray(Bitmap bmp){
+
+    public static byte[] bmpToByteArray(Bitmap bmp) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         return byteArray;
     }
 
-    private void wxShared(int flag){
+    private void wxShared(int flag) {
         WXWebpageObject webpage = new WXWebpageObject();
         webpage.webpageUrl = "https://www.ywwxmm.cn/";
         WXMediaMessage msg = new WXMediaMessage(webpage);
         msg.title = "天黑请闭眼";
         msg.description = "天黑请闭眼";
         Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.mipmap.sryx_logo);
-        Bitmap thumbBmp = Bitmap.createScaledBitmap(thumb,120,120,true);
+        Bitmap thumbBmp = Bitmap.createScaledBitmap(thumb, 120, 120, true);
         msg.thumbData = bmpToByteArray(thumbBmp);
 
         SendMessageToWX.Req req = new SendMessageToWX.Req();
@@ -245,7 +227,7 @@ public class MainActivity extends BaseActivity {
                 });
                 break;
             case R.id.action_qrscan:
-                startActivityForResult(new Intent(this, QrCodeScanActivity.class),1);
+                startActivityForResult(new Intent(this, QrCodeScanActivity.class), 1);
                 break;
             case R.id.action_rule:
                 startActivity(new Intent(this, RuleActivity.class));
@@ -292,13 +274,13 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(data != null){
+        if (data != null) {
             String gameCode = data.getExtras().getString(QrCodeScanActivity.QR_SCAN_RESULT);
             ToastUtils.showLongToast(this, gameCode);
             final String[] strArray = gameCode.split("=");
             String name = strArray[0];
             String value = strArray[1];
-            switch (name){
+            switch (name) {
                 case SryxConfig.Key.GAME_CODE:
                     mSryxModel.joinGameByCode(value, sWxUser.getOpenid(), sWxUser.getNickname(), sWxUser.getHeadimgurl(), new SubscriberOnNextListener<String>() {
                         @Override
@@ -352,5 +334,20 @@ public class MainActivity extends BaseActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(mClient, getIndexApiAction());
         mClient.disconnect();
+    }
+
+    @OnClick({R.id.rl_create_game, R.id.rl_join_game, R.id.rl_my_record})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.rl_create_game:
+                startQuizActivityWithTransition(MainActivity.this, tvCreateGame, SryxConfig.categoryList.get(0).getId());
+                break;
+            case R.id.rl_join_game:
+                startQuizActivityWithTransition(MainActivity.this, tvJoinGame, SryxConfig.categoryList.get(1).getId());
+                break;
+            case R.id.rl_my_record:
+                startQuizActivityWithTransition(MainActivity.this, tvMyRecord, SryxConfig.categoryList.get(2).getId());
+                break;
+        }
     }
 }
