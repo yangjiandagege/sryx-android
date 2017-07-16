@@ -8,6 +8,7 @@ import com.yj.sryx.manager.httpRequest.subscribers.ProgressSubscriber;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.beans.Game;
 import com.yj.sryx.model.beans.HttpResult;
+import com.yj.sryx.model.beans.Player;
 import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.model.service.SryxService;
@@ -130,6 +131,23 @@ public class SryxModelImpl implements SryxModel {
     public void getMyGameRecordList(String playerId, SubscriberOnNextListener<List<Role>> callback) {
         mService.getMyGameRecordList(playerId)
                 .map(new HttpResultFunc<List<Role>>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext, false));
+    }
+
+    @Override
+    public void getMyLastGame(final String playerId, SubscriberOnNextListener<Game> callback) {
+        mService.getPlayer(playerId)
+                .map(new HttpResultFunc<Player>())
+                .flatMap(new Func1<Player, Observable<HttpResult<Game>>>() {
+                    @Override
+                    public Observable<HttpResult<Game>> call(Player result) {
+                        return mService.getGameById(String.valueOf(result.getLastGameId()));
+                    }
+                })
+                .map(new HttpResultFunc<Game>())
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

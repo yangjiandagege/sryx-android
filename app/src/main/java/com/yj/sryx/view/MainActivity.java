@@ -45,6 +45,8 @@ import com.yj.sryx.model.LoginModel;
 import com.yj.sryx.model.LoginModelImpl;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
+import com.yj.sryx.model.beans.Game;
+import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.utils.TransitionHelper;
 import com.yj.sryx.widget.CircleImageView;
@@ -61,6 +63,7 @@ import cn.jpush.android.api.TagAliasCallback;
 
 import static com.yj.sryx.SryxApp.sWxApi;
 import static com.yj.sryx.SryxApp.sWxUser;
+import static com.yj.sryx.view.PrepareGameActivity.KEY_GAME_ID;
 
 public class MainActivity extends BaseActivity {
     @Bind(R.id.img_header)
@@ -96,6 +99,95 @@ public class MainActivity extends BaseActivity {
         mLoginModel = new LoginModelImpl(this);
         initJpush();
         initLayout();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkLastGameState();
+    }
+
+    private void checkLastGameState() {
+        mSryxModel.getMyLastGame(sWxUser.getOpenid(), new SubscriberOnNextListener<Game>() {
+            @Override
+            public void onSuccess(Game game) {
+                if(game.getGameOwnerId().equals(sWxUser.getOpenid())){
+                    if(game.getState() == 0){
+                        showJudgeGamePrepareDialog(game);
+                    }else if(game.getState() == 1){
+                        showJudgeGameProcessDialog(game);
+                    }
+                }else {
+                    if(game.getState() == 0 || game.getState() == 1){
+                        showPlayerGameProcessDialog(game);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String msg) {
+            }
+        });
+    }
+
+    private void showPlayerGameProcessDialog(final Game game) {
+        final NormalDialog dialog = new NormalDialog(this);
+        dialog.content("亲，您还有一局游戏正在进行中！")
+                .btnNum(1)
+                .btnText("继续")
+                .showAnim(new BounceTopEnter())
+                .dismissAnim(new SlideBottomExit())
+                .show();
+
+        dialog.setOnBtnClickL(new OnBtnClickL() {
+            @Override
+            public void onBtnClick() {
+                dialog.dismiss();
+                Intent intent = new Intent(MainActivity.this, MyRoleActivity.class);
+                intent.putExtra(MyRoleActivity.GAME_CODE, game.getInviteCode());
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void showJudgeGameProcessDialog(final Game game) {
+        final NormalDialog dialog = new NormalDialog(this);
+        dialog.content("亲，您有一局游戏正在进行中！")
+                .btnNum(1)
+                .btnText("继续")
+                .showAnim(new BounceTopEnter())
+                .dismissAnim(new SlideBottomExit())
+                .show();
+
+        dialog.setOnBtnClickL(new OnBtnClickL() {
+            @Override
+            public void onBtnClick() {
+                dialog.dismiss();
+                Intent intent = new Intent(MainActivity.this, GameManageActivity.class);
+                intent.putExtra(GameManageActivity.KEY_GAME_ID, String.valueOf(game.getGameId()));
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void showJudgeGamePrepareDialog(final Game game) {
+        final NormalDialog dialog = new NormalDialog(this);
+        dialog.content("亲，您有一局游戏正在准备中！")
+                .btnNum(1)
+                .btnText("继续")
+                .showAnim(new BounceTopEnter())
+                .dismissAnim(new SlideBottomExit())
+                .show();
+
+        dialog.setOnBtnClickL(new OnBtnClickL() {
+            @Override
+            public void onBtnClick() {
+                dialog.dismiss();
+                Intent intent = new Intent(MainActivity.this, PrepareGameActivity.class);
+                intent.putExtra(PrepareGameActivity.KEY_GAME_ID, String.valueOf(game.getGameId()));
+                startActivity(intent);
+            }
+        });
     }
 
     private void initJpush() {

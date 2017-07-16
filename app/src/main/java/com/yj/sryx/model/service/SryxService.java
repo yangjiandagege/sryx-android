@@ -2,6 +2,7 @@ package com.yj.sryx.model.service;
 
 import com.yj.sryx.model.beans.Game;
 import com.yj.sryx.model.beans.HttpResult;
+import com.yj.sryx.model.beans.Player;
 import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.model.beans.WxGetTokenRes;
 
@@ -72,4 +73,8 @@ public interface SryxService {
     Observable<HttpResult<Role>> getMyRoleInGame(
             @Query("playerId") String playerId,
             @Query("gameId") Integer gameId);
+
+    @GET("sryx/getplayerbyid")
+    Observable<HttpResult<Player>> getPlayer(
+            @Query("playerId") String playerId);
 }

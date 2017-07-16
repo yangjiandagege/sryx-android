@@ -65,6 +65,7 @@ public class JoinGameFragment extends Fragment {
                 Intent intent = new Intent(mActivity, MyRoleActivity.class);
                 intent.putExtra(MyRoleActivity.GAME_CODE, gameCode);
                 startActivity(intent);
+                mActivity.finish();
             }
 
             @Override

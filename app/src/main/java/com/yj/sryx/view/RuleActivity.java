@@ -55,7 +55,7 @@ public class RuleActivity extends BaseActivity {
         webSettings.setLoadsImagesAutomatically(true); //支持自动加载图片
         webSettings.setDefaultTextEncodingName("utf-8");//设置编码格式
 
-        wvGameRule.loadUrl("https://www.ywwxmm.cn/");
+        wvGameRule.loadUrl("https://www.ywwxmm.cn/image/game_rule.html");
 
         //设置不用系统浏览器打开,直接显示在当前Webview
         wvGameRule.setWebViewClient(new WebViewClient() {

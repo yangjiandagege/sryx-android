@@ -3,6 +3,7 @@ package com.yj.sryx.widget;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
@@ -37,6 +38,7 @@ public class AcceBar extends LinearLayout {
     private String mManagement;
     private String mCustomizeText;
     private String mPageCode;
+    private boolean mIsBgTransparent;
     private OnManageListener mManageListener;
     private OnSearchListener mSearchListener;
 
@@ -50,16 +52,6 @@ public class AcceBar extends LinearLayout {
     private void findView(Context context, AttributeSet attrs) {
         View view;
         view = View.inflate(context, R.layout.acce_toolbar_dark, this);
-//        if(BaseApp.toolbarTextColor == ContextCompat.getColor(context, R.color.text_dark)) {
-//            LogUtils.logout(BaseApp.toolbarTextColor+" "+ ContextCompat.getColor(context, R.color.text_dark)+" "+ ContextCompat.getColor(context, R.color.text_light));
-//            view = View.inflate(context, R.layout.acce_toolbar_dark, this);
-//        }else if(BaseApp.toolbarTextColor == ContextCompat.getColor(context, R.color.text_light)){
-//            LogUtils.logout(BaseApp.toolbarTextColor+" "+ ContextCompat.getColor(context, R.color.text_dark)+" "+ ContextCompat.getColor(context, R.color.text_light));
-//            view = View.inflate(context, R.layout.acce_toolbar_light, this);
-//        }else {
-//            LogUtils.logout(BaseApp.toolbarTextColor+" "+ ContextCompat.getColor(context, R.color.text_dark)+" "+ ContextCompat.getColor(context, R.color.text_light));
-//            view = View.inflate(context, R.layout.acce_toolbar_light, this);
-//        }
         mContext = context;
 
         ivPressBack = (ImageView) view.findViewById(R.id.iv_press_back);
@@ -72,35 +64,25 @@ public class AcceBar extends LinearLayout {
     private void analyticConfig(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AcceBar);
         isSearchVisible = a.getBoolean(R.styleable.AcceBar_searchVisible, false);
+        mIsBgTransparent = a.getBoolean(R.styleable.AcceBar_isBgTransparent, false);
         mTitle = a.getString(R.styleable.AcceBar_toolbarTitle);
         mManagement = a.getString(R.styleable.AcceBar_management);
         mPageCode =  a.getString(R.styleable.AcceBar_pageCode);
         a.recycle();
     }
 
-
     private void setUpView() {
         ((AppCompatActivity)mContext).setSupportActionBar(toolbar);
 
         ivSearch.setVisibility(isSearchVisible?VISIBLE:GONE);
-
+        if(mIsBgTransparent){
+            toolbar.setBackgroundColor(Color.TRANSPARENT);
+        }
         tvTitle.setText(mTitle);
         if(mManagement != null){
             tvManagement.setVisibility(VISIBLE);
             tvManagement.setText(mManagement);
         }
-
-//        if (SryxApp.toolbarTextColor != 0) {  //表示使用自定义toolbar字体颜色
-//            tvTitle.setTextColor(SryxApp.toolbarTextColor);
-//            tvManagement.setTextColor(SryxApp.toolbarTextColor);
-//            PorterDuffColorFilter filter = new PorterDuffColorFilter(SryxApp.toolbarTextColor, SRC_IN);
-//            Drawable drawableBack = getResources().getDrawable(R.mipmap.ic_arrow_back_black);
-//            drawableBack.setColorFilter(filter);
-//            ivPressBack.setImageDrawable(drawableBack);
-//            Drawable drawableSearch = getResources().getDrawable(R.mipmap.search_toolbar);
-//            drawableSearch.setColorFilter(filter);
-//            ivSearch.setImageDrawable(drawableSearch);
-//        }
 
         ivPressBack.setOnClickListener(new OnClickListener() {
             @Override
