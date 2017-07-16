@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="D:\code\Sryx\demo\assets"><file name="ic_launcher.png" path="D:\code\Sryx\demo\assets\ic_launcher.png"/><file name="test.mp3" path="D:\code\Sryx\demo\assets\test.mp3"/></source><source path="D:\code\Sryx\demo\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="D:\code\Sryx\demo\src\debug\assets"/></dataSet></merger>
