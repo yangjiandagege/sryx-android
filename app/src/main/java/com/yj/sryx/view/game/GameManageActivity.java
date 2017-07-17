@@ -1,4 +1,4 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,6 +22,7 @@ import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.utils.CountDownTimerUtil;
 import com.yj.sryx.utils.TimeUtils;
+import com.yj.sryx.view.BaseActivity;
 import com.yj.sryx.widget.AcceBar;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
 import com.yj.sryx.widget.adapterrv.ViewHolder;

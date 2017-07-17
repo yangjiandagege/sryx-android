@@ -1,4 +1,4 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -7,20 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersSimpleAdapter;
 import com.yj.sryx.R;
 import com.yj.sryx.model.beans.Role;
 
 import java.util.List;
 
-public class GameRecordPlayerStickyGridAdapter extends BaseAdapter implements
+public class GameRecordJudgeStickyGridAdapter extends BaseAdapter implements
 		StickyGridHeadersSimpleAdapter {
 	private List<Role> mRoleList;
 	private LayoutInflater mInflater;
     private Context mContext;
 
-	public GameRecordPlayerStickyGridAdapter(Context context, List<Role> list) {
+	public GameRecordJudgeStickyGridAdapter(Context context, List<Role> list) {
 		this.mRoleList = list;
 		mInflater = LayoutInflater.from(context);
         mContext = context;
@@ -58,18 +57,20 @@ public class GameRecordPlayerStickyGridAdapter extends BaseAdapter implements
 		Role role = getItem(position);
         viewHolder.tvRoom.setText(role.getRoleName());
 		viewHolder.tvConfig.setText(role.getRemark());
-		if(role.getVictorySide() == 2){
-            viewHolder.tvResult.setText("平局");
-        }else {
-            if(role.getVictorySide() == 1 && role.getRoleType() != 0){
-                viewHolder.tvResult.setText("胜利");
-                viewHolder.tvResult.setTextColor(ContextCompat.getColor(mContext, R.color.color_green_500));
-                viewHolder.tvResult.setBackground(ContextCompat.getDrawable(mContext,R.drawable.victory_label_bg));
-            }else {
-                viewHolder.tvResult.setText("失败");
+        switch (role.getVictorySide()){
+            case 0:
+                viewHolder.tvResult.setText("杀手集团");
                 viewHolder.tvResult.setTextColor(ContextCompat.getColor(mContext, R.color.color_red_500));
                 viewHolder.tvResult.setBackground(ContextCompat.getDrawable(mContext,R.drawable.fail_label_bg));
-            }
+                break;
+            case 1:
+                viewHolder.tvResult.setText("正义联盟");
+                viewHolder.tvResult.setTextColor(ContextCompat.getColor(mContext, R.color.color_green_500));
+                viewHolder.tvResult.setBackground(ContextCompat.getDrawable(mContext,R.drawable.victory_label_bg));
+                break;
+            case 2:
+                viewHolder.tvResult.setText("平局");
+                break;
         }
         viewHolder.tvTime.setText(role.getTime());
 		return convertView;

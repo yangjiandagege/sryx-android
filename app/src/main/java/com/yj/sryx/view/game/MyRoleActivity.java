@@ -1,9 +1,8 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +15,7 @@ import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Role;
+import com.yj.sryx.view.BaseActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

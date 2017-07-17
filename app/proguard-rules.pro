@@ -101,3 +101,10 @@
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
 -keep class com.yj.sryx.model.beans.** { *; }
+
+# asmack
+-libraryjars libs/asmack-android-8-4.0.0-rc1.jar
+-keep class com.kenai.jbosh.** {*; }
+-keep class com.novell.sasl.client.** {*; }
+-keep class de.measite.smack.** {*; }
+-keep class org.** {*; }

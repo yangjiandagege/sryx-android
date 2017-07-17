@@ -1,11 +1,10 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,9 +42,9 @@ import com.yj.sryx.model.LoginModelImpl;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Game;
-import com.yj.sryx.model.beans.Role;
-import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.utils.TransitionHelper;
+import com.yj.sryx.view.BaseActivity;
+import com.yj.sryx.view.im.ImActivity;
 import com.yj.sryx.widget.CircleImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -59,7 +59,6 @@ import cn.jpush.android.api.TagAliasCallback;
 
 import static com.yj.sryx.SryxApp.sWxApi;
 import static com.yj.sryx.SryxApp.sWxUser;
-import static com.yj.sryx.view.PrepareGameActivity.KEY_GAME_ID;
 
 public class MainActivity extends BaseActivity {
     @Bind(R.id.img_header)
@@ -80,6 +79,8 @@ public class MainActivity extends BaseActivity {
     TextView tvJoinGame;
     @Bind(R.id.tv_my_record)
     TextView tvMyRecord;
+    @Bind(R.id.iv_friend)
+    ImageView ivFriend;
 
     private LoginModel mLoginModel;
     private static final int MSG_SET_ALIAS = 1001;
@@ -107,14 +108,14 @@ public class MainActivity extends BaseActivity {
         mSryxModel.getMyLastGame(sWxUser.getOpenid(), new SubscriberOnNextListener<Game>() {
             @Override
             public void onSuccess(Game game) {
-                if(game.getGameOwnerId().equals(sWxUser.getOpenid())){
-                    if(game.getState() == 0){
+                if (game.getGameOwnerId().equals(sWxUser.getOpenid())) {
+                    if (game.getState() == 0) {
                         showJudgeGamePrepareDialog(game);
-                    }else if(game.getState() == 1){
+                    } else if (game.getState() == 1) {
                         showJudgeGameProcessDialog(game);
                     }
-                }else {
-                    if(game.getState() == 0 || game.getState() == 1){
+                } else {
+                    if (game.getState() == 0 || game.getState() == 1) {
                         showPlayerGameProcessDialog(game);
                     }
                 }
@@ -375,7 +376,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.rl_create_game, R.id.rl_join_game, R.id.rl_my_record})
+    @OnClick({R.id.rl_create_game, R.id.rl_join_game, R.id.rl_my_record, R.id.iv_friend})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rl_create_game:
@@ -386,6 +387,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.rl_my_record:
                 startQuizActivityWithTransition(MainActivity.this, tvMyRecord, GameRecordsFragment.class.getSimpleName());
+                break;
+            case R.id.iv_friend:
+                startActivity(new Intent(MainActivity.this, ImActivity.class));
                 break;
         }
     }

@@ -2,24 +2,21 @@ package com.yj.sryx;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
-import com.yj.sryx.common.Category;
 import com.yj.sryx.common.Theme;
 import com.yj.sryx.model.beans.WxUser;
-import com.yj.sryx.utils.LogUtils;
-import com.yj.sryx.view.CreateGameFragment;
-import com.yj.sryx.view.GameDetailActivity;
-import com.yj.sryx.view.GameManageActivity;
-import com.yj.sryx.view.GameRecordsFragment;
-import com.yj.sryx.view.JoinGameFragment;
-import com.yj.sryx.view.MainActivity;
-import com.yj.sryx.view.MyRoleActivity;
-import com.yj.sryx.view.PrepareGameActivity;
-import com.yj.sryx.view.QrCodeScanActivity;
-import com.yj.sryx.view.RuleActivity;
+import com.yj.sryx.view.game.CreateGameFragment;
+import com.yj.sryx.view.game.GameDetailActivity;
+import com.yj.sryx.view.game.GameManageActivity;
+import com.yj.sryx.view.game.GameRecordsFragment;
+import com.yj.sryx.view.game.JoinGameFragment;
+import com.yj.sryx.view.game.MainActivity;
+import com.yj.sryx.view.game.MyRoleActivity;
+import com.yj.sryx.view.game.PrepareGameActivity;
+import com.yj.sryx.view.game.QrCodeScanActivity;
+import com.yj.sryx.view.game.RuleActivity;
 import com.zhy.autolayout.config.AutoLayoutConifg;
 
 import java.util.HashMap;

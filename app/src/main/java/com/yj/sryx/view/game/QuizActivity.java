@@ -1,23 +1,18 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
-import android.view.Window;
-import android.widget.FrameLayout;
 
 import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.SryxConfig;
-import com.yj.sryx.common.Category;
 import com.yj.sryx.common.TextSharedElementCallback;
-import com.yj.sryx.utils.ApiLevelHelper;
+import com.yj.sryx.view.BaseActivity;
 import com.yj.sryx.widget.AcceBar;
 
 import java.util.List;

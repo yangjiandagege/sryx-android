@@ -1,4 +1,4 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,6 +14,7 @@ import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.LocalUserManager;
 import com.yj.sryx.model.LoginModelImpl;
+import com.yj.sryx.view.BaseActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

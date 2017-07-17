@@ -40,7 +40,6 @@
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
-
     <!-- 极光推送 end -->
     <application
         android:name=".SryxApp"
@@ -50,7 +49,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".view.SplashActivity"
+            android:name=".view.game.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -59,32 +58,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.MainActivity"
+            android:name=".view.game.MainActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".view.PrepareGameActivity"
+            android:name=".view.game.PrepareGameActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".view.GameManageActivity"
+            android:name=".view.game.GameManageActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".view.QuizActivity"
+            android:name=".view.game.QuizActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.QuizActivity"/>
         <activity
-            android:name=".view.QrCodeScanActivity"
+            android:name=".view.game.QrCodeScanActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".view.GameDetailActivity"
+            android:name=".view.game.GameDetailActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".view.MyRoleActivity"
+            android:name=".view.game.MyRoleActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".view.RuleActivity"
+            android:name=".view.game.RuleActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".wxapi.WXEntryActivity"
@@ -204,5 +203,9 @@
         <meta-data
             android:name="JPUSH_APPKEY"
             android:value="40cf4209576fc7f9e65276c0"/>
+
+        <activity android:name=".view.im.ImActivity">
+        </activity>
     </application>
+
 </manifest>

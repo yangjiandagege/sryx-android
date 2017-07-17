@@ -1,4 +1,4 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -34,6 +34,7 @@ import com.yj.sryx.utils.CountDownTimerUtil;
 import com.yj.sryx.utils.EncodingHandler;
 import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.SizeUtils;
+import com.yj.sryx.view.BaseActivity;
 import com.yj.sryx.widget.AcceBar;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
 import com.yj.sryx.widget.adapterrv.ViewHolder;

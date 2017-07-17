@@ -1,4 +1,4 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

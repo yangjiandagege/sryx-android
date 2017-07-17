@@ -1,4 +1,4 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +18,7 @@ import com.yj.sryx.manager.StatusBarUtil;
 import com.yj.sryx.manager.qrcode.core.QRCodeView;
 import com.yj.sryx.manager.qrcode.zxing.QRCodeDecoder;
 import com.yj.sryx.manager.qrcode.zxing.ZXingView;
+import com.yj.sryx.view.BaseActivity;
 
 import java.io.File;
 

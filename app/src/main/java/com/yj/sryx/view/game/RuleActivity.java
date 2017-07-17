@@ -1,4 +1,4 @@
-package com.yj.sryx.view;
+package com.yj.sryx.view.game;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +12,7 @@ import android.webkit.WebViewClient;
 import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.utils.LogUtils;
+import com.yj.sryx.view.BaseActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
