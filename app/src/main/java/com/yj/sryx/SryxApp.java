@@ -6,6 +6,8 @@ import android.content.Context;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.yj.sryx.common.Theme;
+import com.yj.sryx.model.AsmackModel;
+import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.view.game.CreateGameFragment;
 import com.yj.sryx.view.game.GameDetailActivity;
@@ -44,6 +46,8 @@ public class SryxApp extends Application {
         initWxApi();
         //初始化主题map
         initThemeMap();
+        //初始化IM
+        new AsmackModelImpl(sContext).initXMPPConnection(null);
     }
 
     private void initThemeMap() {

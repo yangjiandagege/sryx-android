@@ -46,7 +46,7 @@ public class SryxModelImpl implements SryxModel {
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ProgressSubscriber(callback, mContext));
+                .subscribe(new ProgressSubscriber(callback, mContext, false));
     }
 
     @Override
@@ -148,6 +148,16 @@ public class SryxModelImpl implements SryxModel {
                     }
                 })
                 .map(new HttpResultFunc<Game>())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ProgressSubscriber(callback, mContext, false));
+    }
+
+    @Override
+    public void getPlayerById(String openid, SubscriberOnNextListener<Player> callback) {
+        mService.getPlayer(openid)
+                .map(new HttpResultFunc<Player>())
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -1,11 +1,6 @@
 package com.yj.sryx.model;
 
-import com.yj.sryx.manager.httpRequest.BeanCallback;
-import com.yj.sryx.utils.LogUtils;
-
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by eason.yang on 2017/7/10.

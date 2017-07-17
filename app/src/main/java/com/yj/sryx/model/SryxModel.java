@@ -2,6 +2,7 @@ package com.yj.sryx.model;
 
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.beans.Game;
+import com.yj.sryx.model.beans.Player;
 import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.model.beans.WxUser;
 
@@ -37,4 +38,6 @@ public interface SryxModel {
     void getMyGameRecordList(String playerId, SubscriberOnNextListener<List<Role>> callback);
 
     void getMyLastGame(String playerId, SubscriberOnNextListener<Game> callback);
+
+    void getPlayerById(String openid, SubscriberOnNextListener<Player> subscriberOnNextListener);
 }

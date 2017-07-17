@@ -35,6 +35,36 @@
             android:padding="32px"
             android:gravity="center"
             android:text="登录"/>
+
+        <Button
+            android:id="@+id/btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="32px"
+            android:padding="32px"
+            android:gravity="center"
+            android:text="查询账户"/>
+
+        <Button
+            android:id="@+id/btn_vcard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="32px"
+            android:padding="32px"
+            android:gravity="center"
+            android:text="获取联系人信息"/>
+
+        <Button
+            android:id="@+id/btn_add_friend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="32px"
+            android:padding="32px"
+            android:gravity="center"
+            android:text="添加好友"/>
     </LinearLayout>
 
 </RelativeLayout>

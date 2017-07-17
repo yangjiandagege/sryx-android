@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.yj.sryx.R;
+import com.yj.sryx.model.beans.Contact;
+import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.view.BaseActivity;
 
@@ -14,6 +16,15 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.XMPPTCPConnection;
+import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smack.util.Base64;
+import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.search.ReportedData;
+import org.jivesoftware.smackx.search.UserSearchManager;
+import org.jivesoftware.smackx.vcardtemp.VCardManager;
+import org.jivesoftware.smackx.vcardtemp.packet.VCard;
+import org.jivesoftware.smackx.vcardtemp.provider.VCardProvider;
+import org.jivesoftware.smackx.xdata.Form;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -34,6 +45,7 @@ public class ImActivity extends BaseActivity {
     @Bind(R.id.btn_login)
     Button btnLogin;
 
+    private String mUserTmp;
     private XMPPConnection mXMPPConn;
 
     @Override
@@ -45,7 +57,7 @@ public class ImActivity extends BaseActivity {
     }
 
 
-    @OnClick({R.id.btn_register, R.id.btn_login})
+    @OnClick({R.id.btn_register, R.id.btn_login, R.id.btn_search, R.id.btn_add_friend, R.id.btn_vcard})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_register:
@@ -54,7 +66,116 @@ public class ImActivity extends BaseActivity {
             case R.id.btn_login:
                 login();
                 break;
+            case R.id.btn_search:
+                searchAccount();
+                break;
+            case R.id.btn_add_friend:
+                addFriend();
+                break;
+            case R.id.btn_vcard:
+                getVcard();
+                break;
         }
+    }
+
+    private void getVcard() {
+        Observable.create(new Observable.OnSubscribe<Contact>() {
+            @Override
+            public void call(Subscriber<? super Contact> subscriber) {
+                Contact contact = new Contact();
+                VCard vCard = new VCard();
+                try {
+                    vCard.load(mXMPPConn, mUserTmp);
+                    contact.account = mUserTmp;
+                    contact.name = vCard.getNickName();
+//                    contact.avatar = Base64.encodeBytes(vCard.getAvatar());
+                    subscriber.onNext(contact);
+                } catch (SmackException.NoResponseException
+                        | XMPPException.XMPPErrorException
+                        | SmackException.NotConnectedException e) {
+                    LogUtils.logout("  "+e.getMessage());
+                    e.printStackTrace();
+                    subscriber.onError(e);
+                }
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+                .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+                .subscribe(new Observer<Contact>() {   //订阅观察者（其实是观察者订阅被观察者）
+                    @Override
+                    public void onNext(Contact res) {
+                        ToastUtils.showLongToast(ImActivity.this, "account：" + res.account+" name: "+res.name+" avatar: "+res.avatar);
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtils.showLongToast(ImActivity.this, "获取联系人信息失败"+e);
+                    }
+                });
+    }
+
+    private void addFriend() {
+
+    }
+
+    private void searchAccount() {
+        Observable.create(new Observable.OnSubscribe<ReportedData.Row>() {
+            @Override
+            public void call(Subscriber<? super ReportedData.Row> subscriber) {
+                try {
+                    // 创建搜索
+                    UserSearchManager searchManager = new UserSearchManager(mXMPPConn);
+                    LogUtils.logout("search." + mXMPPConn.getServiceName());
+                    // 获取搜索表单
+                    Form searchForm = searchManager.getSearchForm("search." + mXMPPConn.getServiceName());
+                    // 提交表单
+                    Form answerForm = searchForm.createAnswerForm();
+                    // 某个字段设成true就会在那个字段里搜索关键字，search字段设置要搜索的关键字
+                    answerForm.setAnswer("search", "miaomiao");
+                    answerForm.setAnswer("Username", true);
+                    // 提交搜索表单
+                    ReportedData data = searchManager.getSearchResults(answerForm, "search." + mXMPPConn.getServiceName());
+                    // 遍历结果列
+                    for (ReportedData.Row row : data.getRows()) {
+                        subscriber.onNext(row);
+                    }
+                } catch (SmackException.NoResponseException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } catch (SmackException.NotConnectedException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                }
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+                .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+                .subscribe(new Observer<ReportedData.Row>() {   //订阅观察者（其实是观察者订阅被观察者）
+                    @Override
+                    public void onNext(ReportedData.Row res) {
+                        LogUtils.logout("搜到：" + res.getValues("jid").get(0));
+                        ToastUtils.showLongToast(ImActivity.this, "搜到：" + res.getValues("jid").get(0));
+                        mUserTmp = res.getValues("jid").get(0);
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtils.showLongToast(ImActivity.this, "搜索失败");
+                    }
+                });
     }
 
     private void register() {
@@ -64,7 +185,7 @@ public class ImActivity extends BaseActivity {
                 try {
                     AccountManager accountManager = AccountManager.getInstance(mXMPPConn);
                     Map<String, String> map = new HashMap<String, String>();
-                    map.put("name","yangjian1");
+                    map.put("name", "yangjian1");
                     accountManager.createAccount("yangjian1", "yangjian1", map);
                 } catch (SmackException e) {
                     subscriber.onError(e);
@@ -77,31 +198,41 @@ public class ImActivity extends BaseActivity {
                 subscriber.onCompleted();
             }
         })
-        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
-        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
-        .subscribe(new Observer<Integer>() {   //订阅观察者（其实是观察者订阅被观察者）
-            @Override
-            public void onNext(Integer res) {
-                ToastUtils.showLongToast(ImActivity.this, "注册成功");
-            }
+                .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+                .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+                .subscribe(new Observer<Integer>() {   //订阅观察者（其实是观察者订阅被观察者）
+                    @Override
+                    public void onNext(Integer res) {
+                        ToastUtils.showLongToast(ImActivity.this, "注册成功");
+                    }
 
-            @Override
-            public void onCompleted() {
-            }
+                    @Override
+                    public void onCompleted() {
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                ToastUtils.showLongToast(ImActivity.this, "注册失败");
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtils.showLongToast(ImActivity.this, "注册失败");
+                    }
+                });
     }
 
-    private void login(){
+    private void login() {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 try {
-                    mXMPPConn.login("miaomiao", "miaomiao", "eason.yang");
+                    mXMPPConn.login("yangjian1", "yangjian1", mXMPPConn.getServiceName());
+
+                    VCard me = new VCard();
+                    me.load(mXMPPConn);
+                    me.setEmailHome("miaomiao@sina.com");
+                    me.setOrganization("售后");
+                    me.setNickName("颜昌军t2");
+                    me.setField("sex", "男");
+                    me.setPhoneWork("PHONE", "3443233");
+                    me.setField("DESC", "描述信息。。。");
+                    me.save(mXMPPConn);
                 } catch (SmackException e) {
                     subscriber.onError(e);
                     e.printStackTrace();
@@ -116,23 +247,23 @@ public class ImActivity extends BaseActivity {
                 subscriber.onCompleted();
             }
         })
-        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
-        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
-        .subscribe(new Observer<Integer>() {   //订阅观察者（其实是观察者订阅被观察者）
-            @Override
-            public void onNext(Integer res) {
-                ToastUtils.showLongToast(ImActivity.this, "登录成功");
-            }
+                .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+                .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+                .subscribe(new Observer<Integer>() {   //订阅观察者（其实是观察者订阅被观察者）
+                    @Override
+                    public void onNext(Integer res) {
+                        ToastUtils.showLongToast(ImActivity.this, "登录成功");
+                    }
 
-            @Override
-            public void onCompleted() {
-            }
+                    @Override
+                    public void onCompleted() {
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                ToastUtils.showLongToast(ImActivity.this, "登录失败");
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtils.showLongToast(ImActivity.this, "登录失败");
+                    }
+                });
     }
 
     private void initXMPPConnection() {
@@ -146,6 +277,7 @@ public class ImActivity extends BaseActivity {
                 mXMPPConn = new XMPPTCPConnection(config);
                 try {
                     mXMPPConn.connect();
+                    ProviderManager.getInstance().addIQProvider(VCardManager.ELEMENT, VCardManager.NAMESPACE, new VCardProvider());
                 } catch (SmackException e) {
                     subscriber.onError(e);
                     e.printStackTrace();
@@ -160,22 +292,22 @@ public class ImActivity extends BaseActivity {
                 subscriber.onCompleted();
             }
         })
-        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
-        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
-        .subscribe(new Observer<Integer>() {   //订阅观察者（其实是观察者订阅被观察者）
-            @Override
-            public void onNext(Integer res) {
-                ToastUtils.showLongToast(ImActivity.this, "连接成功");
-            }
+                .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+                .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+                .subscribe(new Observer<Integer>() {   //订阅观察者（其实是观察者订阅被观察者）
+                    @Override
+                    public void onNext(Integer res) {
+                        ToastUtils.showLongToast(ImActivity.this, "连接成功");
+                    }
 
-            @Override
-            public void onCompleted() {
-            }
+                    @Override
+                    public void onCompleted() {
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                ToastUtils.showLongToast(ImActivity.this, "连接失败");
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtils.showLongToast(ImActivity.this, "连接失败");
+                    }
+                });
     }
 }
