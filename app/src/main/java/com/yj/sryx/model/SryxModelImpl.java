@@ -144,7 +144,11 @@ public class SryxModelImpl implements SryxModel {
                 .flatMap(new Func1<Player, Observable<HttpResult<Game>>>() {
                     @Override
                     public Observable<HttpResult<Game>> call(Player result) {
-                        return mService.getGameById(String.valueOf(result.getLastGameId()));
+                        if(null != result.getLastGameId()){
+                            return mService.getGameById(String.valueOf(result.getLastGameId()));
+                        }else {
+                            return null;
+                        }
                     }
                 })
                 .map(new HttpResultFunc<Game>())

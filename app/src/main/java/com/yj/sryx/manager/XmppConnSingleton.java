@@ -1,5 +1,7 @@
 package com.yj.sryx.manager;
 
+import com.yj.sryx.utils.LogUtils;
+
 import org.jivesoftware.smack.XMPPConnection;
 
 /**
@@ -11,11 +13,7 @@ public class XmppConnSingleton {
 
     public static synchronized XMPPConnection getInstance(){
         if(null == sXmppConnection){
-            try {
-                throw new Exception("XMPPConnection未初始化！");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LogUtils.logout("XMPPConnection未初始化！");
         }
         return sXmppConnection;
     }
@@ -24,11 +22,7 @@ public class XmppConnSingleton {
         if(null == sXmppConnection) {
             sXmppConnection = connection;
         }else {
-            try {
-                throw new Exception("XMPPConnection仅允许初始化一次！");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LogUtils.logout("XMPPConnection仅允许初始化一次！");
         }
     }
 }

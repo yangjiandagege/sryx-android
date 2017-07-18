@@ -37,11 +37,15 @@ import com.yj.sryx.jpush.LocalAliasAndTags;
 import com.yj.sryx.manager.ActivityStackManager;
 import com.yj.sryx.manager.StatusBarUtil;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.AsmackModel;
+import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.LoginModel;
 import com.yj.sryx.model.LoginModelImpl;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Game;
+import com.yj.sryx.utils.LogUtils;
+import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.utils.TransitionHelper;
 import com.yj.sryx.view.BaseActivity;
 import com.yj.sryx.view.im.ImActivity;
@@ -61,6 +65,7 @@ import static com.yj.sryx.SryxApp.sWxApi;
 import static com.yj.sryx.SryxApp.sWxUser;
 
 public class MainActivity extends BaseActivity {
+    public static final java.lang.String IS_ALREADY_LOGIN = "is_already_login";
     @Bind(R.id.img_header)
     CircleImageView imgHeader;
     @Bind(R.id.tv_nickname)
@@ -82,10 +87,12 @@ public class MainActivity extends BaseActivity {
     @Bind(R.id.iv_friend)
     ImageView ivFriend;
 
-    private LoginModel mLoginModel;
+
     private static final int MSG_SET_ALIAS = 1001;
 
     private SryxModel mSryxModel;
+    private LoginModel mLoginModel;
+    private AsmackModel mAsmackModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +101,12 @@ public class MainActivity extends BaseActivity {
         ButterKnife.bind(this);
         mSryxModel = new SryxModelImpl(this);
         mLoginModel = new LoginModelImpl(this);
+        mAsmackModel = new AsmackModelImpl(this);
         initJpush();
         initLayout();
+        if(!getIntent().getExtras().getBoolean(IS_ALREADY_LOGIN, false)){
+            openfireLogin();
+        }
     }
 
     @Override
@@ -104,19 +115,37 @@ public class MainActivity extends BaseActivity {
         checkLastGameState();
     }
 
+    private void openfireLogin(){
+        mAsmackModel.login(sWxUser.getOpenid(), sWxUser.getOpenid(), sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
+            @Override
+            public void onSuccess(Integer integer) {
+                LogUtils.logout("登录Openfire成功！");
+                ToastUtils.showLongToast(MainActivity.this, "登录Openfire成功！");
+            }
+
+            @Override
+            public void onError(String msg) {
+                LogUtils.logout("登录Openfire失败！");
+                ToastUtils.showLongToast(MainActivity.this, "登录Openfire失败！");
+            }
+        });
+    }
+
     private void checkLastGameState() {
         mSryxModel.getMyLastGame(sWxUser.getOpenid(), new SubscriberOnNextListener<Game>() {
             @Override
             public void onSuccess(Game game) {
-                if (game.getGameOwnerId().equals(sWxUser.getOpenid())) {
-                    if (game.getState() == 0) {
-                        showJudgeGamePrepareDialog(game);
-                    } else if (game.getState() == 1) {
-                        showJudgeGameProcessDialog(game);
-                    }
-                } else {
-                    if (game.getState() == 0 || game.getState() == 1) {
-                        showPlayerGameProcessDialog(game);
+                if(null != game) {
+                    if (game.getGameOwnerId().equals(sWxUser.getOpenid())) {
+                        if (game.getState() == 0) {
+                            showJudgeGamePrepareDialog(game);
+                        } else if (game.getState() == 1) {
+                            showJudgeGameProcessDialog(game);
+                        }
+                    } else {
+                        if (game.getState() == 0 || game.getState() == 1) {
+                            showPlayerGameProcessDialog(game);
+                        }
                     }
                 }
             }

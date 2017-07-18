@@ -77,14 +77,10 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                         public void onSuccess(WxUser result) {
                             sWxUser = result;
                             LocalUserManager.serializeUser(SryxApp.sContext, sWxUser);
-                            mActivity.finish();
-                            ActivityStackManager.getInstance().finishActivity(SplashActivity.class);
-                            Intent gotoMain = new Intent(mActivity, MainActivity.class);
-                            mActivity.startActivity(gotoMain);
                             mSryxModel.getPlayerById(sWxUser.getOpenid(), new SubscriberOnNextListener<Player>() {
                                 @Override
                                 public void onSuccess(Player s) {
-                                    openfireLogin();
+                                    gotoMianActivity();
                                 }
 
                                 @Override
@@ -93,7 +89,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                                     mSryxModel.updatePlayer(sWxUser, new SubscriberOnNextListener<String>() {
                                         @Override
                                         public void onSuccess(String s) {
-                                            openfireRegisterThenLogin();
+                                            openfireRegister();
                                         }
 
                                         @Override
@@ -125,31 +121,29 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
         }
     }
 
-    private void openfireRegisterThenLogin(){
-        mAsmackModel.register(sWxUser.getOpenid(), sWxUser.getOpenid(), sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
+    private void openfireRegister(){
+        mAsmackModel.registerThenLogin(sWxUser.getOpenid(), sWxUser.getOpenid(), sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
             @Override
             public void onSuccess(Integer integer) {
-                openfireLogin();
+                LogUtils.logout("注册Openfire成功！登录成功");
+                ToastUtils.showLongToast(mActivity, "注册Openfire成功！");
+
+                gotoMianActivity();
             }
 
             @Override
             public void onError(String msg) {
+                LogUtils.logout("注册Openfire失败！");
                 ToastUtils.showLongToast(mActivity, "注册Openfire失败！");
             }
         });
     }
 
-    private void openfireLogin(){
-        mAsmackModel.login(sWxUser.getOpenid(), sWxUser.getOpenid(), sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
-            @Override
-            public void onSuccess(Integer integer) {
-                ToastUtils.showLongToast(mActivity, "登录Openfire成功！");
-            }
-
-            @Override
-            public void onError(String msg) {
-                ToastUtils.showLongToast(mActivity, "登录Openfire失败！");
-            }
-        });
+    private void gotoMianActivity(){
+        mActivity.finish();
+        ActivityStackManager.getInstance().finishActivity(SplashActivity.class);
+        Intent gotoMain = new Intent(mActivity, MainActivity.class);
+        gotoMain.putExtra(MainActivity.IS_ALREADY_LOGIN, true);
+        mActivity.startActivity(gotoMain);
     }
 }

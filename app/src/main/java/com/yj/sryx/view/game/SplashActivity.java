@@ -73,7 +73,9 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void jumpMainView() {
-        startActivity(new Intent(this, MainActivity.class));
+        Intent gotoMain = new Intent(this, MainActivity.class);
+        gotoMain.putExtra(MainActivity.IS_ALREADY_LOGIN, false);
+        startActivity(gotoMain);
         finish();
     }
 

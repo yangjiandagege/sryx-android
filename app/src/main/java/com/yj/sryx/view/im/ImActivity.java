@@ -1,14 +1,19 @@
 package com.yj.sryx.view.im;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import com.yj.sryx.R;
+import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.AsmackModel;
+import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.beans.Contact;
 import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.view.BaseActivity;
+import com.yj.sryx.view.game.MainActivity;
 
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -39,6 +44,8 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.yj.sryx.SryxApp.sWxUser;
+
 public class ImActivity extends BaseActivity {
     static final String HOST = "39.108.82.35";
     static final int PORT = 5222;
@@ -47,13 +54,17 @@ public class ImActivity extends BaseActivity {
 
     private String mUserTmp;
     private XMPPConnection mXMPPConn;
+    private AsmackModel mAsmackModel;
+    private Activity mActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_im);
         ButterKnife.bind(this);
-        initXMPPConnection();
+//        initXMPPConnection();
+        mAsmackModel = new AsmackModelImpl(this);
+        mActivity = this;
     }
 
 
@@ -61,10 +72,32 @@ public class ImActivity extends BaseActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_register:
-                register();
+                mAsmackModel.register(sWxUser.getOpenid(), sWxUser.getOpenid(), sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        ToastUtils.showLongToast(mActivity, "注册Openfire成功！");
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                        ToastUtils.showLongToast(mActivity, "注册Openfire失败！");
+                    }
+                });
+//                register();
                 break;
             case R.id.btn_login:
-                login();
+                mAsmackModel.login(sWxUser.getOpenid(), sWxUser.getOpenid(), sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        ToastUtils.showLongToast(mActivity, "登录Openfire成功！");
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                        ToastUtils.showLongToast(mActivity, "登录Openfire失败！");
+                    }
+                });
+//                login();
                 break;
             case R.id.btn_search:
                 searchAccount();
@@ -185,12 +218,9 @@ public class ImActivity extends BaseActivity {
                 try {
                     AccountManager accountManager = AccountManager.getInstance(mXMPPConn);
                     Map<String, String> map = new HashMap<String, String>();
-                    map.put("name", "yangjian1");
-                    accountManager.createAccount("yangjian1", "yangjian1", map);
-                } catch (SmackException e) {
-                    subscriber.onError(e);
-                    e.printStackTrace();
-                } catch (XMPPException e) {
+                    map.put("name", "yangjiandagege");
+                    accountManager.createAccount("yangjiandagege", "yangjiandagege", map);
+                } catch (SmackException | XMPPException e) {
                     subscriber.onError(e);
                     e.printStackTrace();
                 }

@@ -46,8 +46,6 @@ public class SryxApp extends Application {
         initWxApi();
         //初始化主题map
         initThemeMap();
-        //初始化IM
-        new AsmackModelImpl(sContext).initXMPPConnection(null);
     }
 
     private void initThemeMap() {

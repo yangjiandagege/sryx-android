@@ -12,4 +12,5 @@ public interface AsmackModel {
     void initXMPPConnection(SubscriberOnNextListener<Integer> callback);
     void register(String account, String pwd, String name, SubscriberOnNextListener<Integer> callback);
     void login(String account, String pwd, String name, SubscriberOnNextListener<Integer> callback);
+    void registerThenLogin(String account, String pwd, String name, SubscriberOnNextListener<Integer> callback);
 }
