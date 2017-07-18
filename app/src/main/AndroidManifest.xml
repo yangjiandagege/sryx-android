@@ -40,6 +40,7 @@
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
+
     <!-- 极光推送 end -->
     <application
         android:name=".SryxApp"
@@ -205,6 +206,8 @@
             android:value="40cf4209576fc7f9e65276c0"/>
 
         <activity android:name=".view.im.ImActivity">
+        </activity>
+        <activity android:name=".view.im.SearchFriendActivity">
         </activity>
     </application>
 

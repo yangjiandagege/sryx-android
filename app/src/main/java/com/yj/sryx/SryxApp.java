@@ -19,6 +19,7 @@ import com.yj.sryx.view.game.MyRoleActivity;
 import com.yj.sryx.view.game.PrepareGameActivity;
 import com.yj.sryx.view.game.QrCodeScanActivity;
 import com.yj.sryx.view.game.RuleActivity;
+import com.yj.sryx.view.im.ImActivity;
 import com.zhy.autolayout.config.AutoLayoutConifg;
 
 import java.util.HashMap;
@@ -63,6 +64,8 @@ public class SryxApp extends Application {
 
         sActivityThemeMap.put(GameRecordsFragment.class.getSimpleName(), Theme.spe);
         sActivityThemeMap.put(GameDetailActivity.class.getSimpleName(), Theme.spe);
+
+        sActivityThemeMap.put(ImActivity.class.getSimpleName(), Theme.spe);
     }
 
     private void initJpush() {

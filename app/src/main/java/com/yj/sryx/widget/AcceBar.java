@@ -27,20 +27,13 @@ public class AcceBar extends LinearLayout {
     private ImageView ivPressBack;
     private TextView tvTitle;
     private TextView tvManagement;
-    private ImageView ivSearch;
     private Toolbar toolbar;
 
     private Context mContext;
-
-    private boolean isSearchVisible;
-
     private String mTitle;
     private String mManagement;
-    private String mCustomizeText;
-    private String mPageCode;
     private boolean mIsBgTransparent;
     private OnManageListener mManageListener;
-    private OnSearchListener mSearchListener;
 
     public AcceBar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,24 +50,20 @@ public class AcceBar extends LinearLayout {
         ivPressBack = (ImageView) view.findViewById(R.id.iv_press_back);
         tvTitle = (TextView) view.findViewById(R.id.tv_title);
         tvManagement = (TextView) view.findViewById(R.id.tv_management);
-        ivSearch = (ImageView) view.findViewById(R.id.iv_search);
         toolbar = (Toolbar) view.findViewById(R.id.acce_toolbar);
     }
 
     private void analyticConfig(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AcceBar);
-        isSearchVisible = a.getBoolean(R.styleable.AcceBar_searchVisible, false);
         mIsBgTransparent = a.getBoolean(R.styleable.AcceBar_isBgTransparent, false);
         mTitle = a.getString(R.styleable.AcceBar_toolbarTitle);
         mManagement = a.getString(R.styleable.AcceBar_management);
-        mPageCode =  a.getString(R.styleable.AcceBar_pageCode);
         a.recycle();
     }
 
     private void setUpView() {
         ((AppCompatActivity)mContext).setSupportActionBar(toolbar);
 
-        ivSearch.setVisibility(isSearchVisible?VISIBLE:GONE);
         if(mIsBgTransparent){
             toolbar.setBackgroundColor(Color.TRANSPARENT);
         }
@@ -96,14 +85,6 @@ public class AcceBar extends LinearLayout {
             public void onClick(View v) {
                 if(mManageListener != null) {
                     mManageListener.OnManageClick();
-                }
-            }
-        });
-        ivSearch.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mSearchListener != null) {
-                    mSearchListener.OnSearchClick();
                 }
             }
         });
@@ -143,10 +124,6 @@ public class AcceBar extends LinearLayout {
 
     public void setManagementClickListener(OnManageListener listener){
         mManageListener = listener;
-    }
-
-    public void setSearchClickListener(OnSearchListener listener){
-        mSearchListener = listener;
     }
 
     public interface OnManageListener {

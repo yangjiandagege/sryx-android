@@ -2,9 +2,12 @@ package com.yj.sryx.model;
 
 import android.content.Context;
 
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.XmppConnSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.ProgressSubscriber;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.beans.Contact;
+import com.yj.sryx.utils.FormatTools;
 import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.view.im.ImActivity;
@@ -17,12 +20,24 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.XMPPTCPConnection;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smack.util.Base64;
+import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.search.ReportedData;
+import org.jivesoftware.smackx.search.UserSearchManager;
 import org.jivesoftware.smackx.vcardtemp.VCardManager;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 import org.jivesoftware.smackx.vcardtemp.provider.VCardProvider;
+import org.jivesoftware.smackx.xdata.Form;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
@@ -133,12 +148,14 @@ public class AsmackModelImpl implements AsmackModel {
                         try {
                             connection.login(account, pwd, connection.getServiceName());
 
-                            VCard me = new VCard();
-                            me.load(connection);
-                            me.setNickName(name);
-                            me.save(connection);
+                            VCard meVcard = new VCard();
+                            meVcard.load(connection);
+                            meVcard.setNickName(name);
+                            meVcard.setAvatar(getImage(SryxApp.sWxUser.getHeadimgurl()));
+                            meVcard.save(connection);
+
                             subscriber.onNext(0);
-                        } catch (SmackException | IOException | XMPPException e) {
+                        } catch (Exception e) {
                             subscriber.onError(e);
                             e.printStackTrace();
                         } finally {
@@ -172,4 +189,108 @@ public class AsmackModelImpl implements AsmackModel {
             }
         });
     }
+
+    @Override
+    public void searchFriends(final String keyword, final SubscriberOnNextListener<List<Contact>> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<List<Contact>>() {
+            @Override
+            public void call(Subscriber<? super List<Contact>> subscriber) {
+                try {
+                    List<Contact> contactList = new ArrayList<Contact>();
+                    // 创建搜索
+                    UserSearchManager searchManager = new UserSearchManager(connection);
+                    // 获取搜索表单
+                    Form searchForm = searchManager.getSearchForm("search." + connection.getServiceName());
+                    // 提交表单
+                    Form answerForm = searchForm.createAnswerForm();
+                    // 某个字段设成true就会在那个字段里搜索关键字，search字段设置要搜索的关键字
+                    answerForm.setAnswer("search", keyword);
+                    answerForm.setAnswer("Name", true);
+                    // 提交搜索表单
+                    ReportedData data = searchManager.getSearchResults(answerForm, "search." + connection.getServiceName());
+                    // 遍历结果列
+                    for (ReportedData.Row row : data.getRows()) {
+                        String jid = row.getValues("jid").get(0);
+                        Contact contact = new Contact();
+                        VCard vCard = new VCard();
+                        vCard.load(connection, jid);
+                        contact.account = jid;
+                        contact.name = vCard.getNickName();
+                        if(null != vCard.getAvatar()) {
+                            LogUtils.logout(vCard.getAvatar().toString());
+                            contact.avatar = FormatTools.getInstance().InputStream2Drawable(new ByteArrayInputStream(vCard.getAvatar()));
+                        }
+                        contactList.add(contact);
+                    }
+                    subscriber.onNext(contactList);
+                } catch (SmackException.NoResponseException
+                        | XMPPException.XMPPErrorException
+                        | SmackException.NotConnectedException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    /**
+     * Get image from newwork
+     * @param path The path of image
+     * @return byte[]
+     * @throws Exception
+     */
+    public byte[] getImage(String path) throws Exception{
+        URL url = new URL(path);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setConnectTimeout(5 * 1000);
+        conn.setRequestMethod("GET");
+        InputStream inStream = conn.getInputStream();
+        if(conn.getResponseCode() == HttpURLConnection.HTTP_OK){
+            return readStream(inStream);
+        }
+        return null;
+    }
+
+    /**
+     * Get image from newwork
+     * @param path The path of image
+     * @return InputStream
+     * @throws Exception
+     */
+    public InputStream getImageStream(String path) throws Exception{
+        URL url = new URL(path);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setConnectTimeout(5 * 1000);
+        conn.setRequestMethod("GET");
+        if(conn.getResponseCode() == HttpURLConnection.HTTP_OK){
+            return conn.getInputStream();
+        }
+        return null;
+    }
+
+    /**
+     * Get data from stream
+     * @param inStream
+     * @return byte[]
+     * @throws Exception
+     */
+    public static byte[] readStream(InputStream inStream) throws Exception{
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while( (len=inStream.read(buffer)) != -1){
+            outStream.write(buffer, 0, len);
+        }
+        outStream.close();
+        inStream.close();
+        return outStream.toByteArray();
+    }
+
+
 }

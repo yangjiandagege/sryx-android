@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/theme_yellow_background</color>
-    <color name="colorPrimaryDark">@color/theme_yellow_background</color>
+    <color name="colorPrimary">@color/theme_spe_primary</color>
+    <color name="colorPrimaryDark">@color/theme_spe_primary_dark</color>
     <color name="colorAccent">#616161</color>
 
     <color name="color_evil">#d4237a</color>
