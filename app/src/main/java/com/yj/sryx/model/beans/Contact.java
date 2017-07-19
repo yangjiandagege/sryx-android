@@ -14,6 +14,9 @@ public class Contact{
 	public String sort;
 	public String index;
 	public Drawable avatar;
+    public String sex;
+    public String province;
+    public String city;
 
 	public String getAccount() {
 		return account;
@@ -53,5 +56,29 @@ public class Contact{
 
     public void setAvatar(Drawable avatar) {
         this.avatar = avatar;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

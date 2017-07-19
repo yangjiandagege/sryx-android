@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:paddingBottom="10dp"
+              android:paddingTop="10dp">
+
+    <RelativeLayout
+        android:id="@+id/rl_time"
+        android:layout_width="match_parent"
+        android:layout_height="27dp"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp">
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="17dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/timeback"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            tools:text="12:14"
+            android:textColor="#fff"
+            android:textSize="10sp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:id="@+id/iv_header"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@mipmap/cnm"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@id/iv_header"
+            android:background="@drawable/chat_me_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+
+            <TextView
+                android:id="@+id/tv_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:padding="5dp"
+                tools:text="你好，大傻子！汪汪汪"
+                android:textColor="#444444"
+                android:textSize="16sp"/>
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_resend"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_alignLeft="@id/rl_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="-22dp"
+            android:background="@mipmap/resend"
+            android:visibility="gone"/>
+
+        <ProgressBar
+            android:id="@+id/pb_sending"
+            style="@android:style/Widget.ProgressBar.Small.Inverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/rl_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="-22dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/pb_unread"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/rl_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="-32dp"
+            android:text="未读"
+            android:textColor="#c00000"
+            android:textSize="12sp"
+            android:visibility="gone"/>
+    </RelativeLayout>
+</LinearLayout>

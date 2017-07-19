@@ -35,9 +35,17 @@
             app:drawableDel="@mipmap/edit_delete"/>
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/test"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_list_friend"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@mipmap/header_pic"/>
+        android:layout_marginTop="20px"
+        android:background="@color/color_white"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        android:transitionGroup="false"
+        app:layoutManager="android.support.v7.widget.GridLayoutManager"
+        app:spanCount="1"
+        tools:ignore="UnusedAttribute"/>
 </LinearLayout>

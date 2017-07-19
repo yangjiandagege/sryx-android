@@ -2,6 +2,7 @@ package com.yj.sryx;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -20,6 +21,7 @@ import com.yj.sryx.view.game.PrepareGameActivity;
 import com.yj.sryx.view.game.QrCodeScanActivity;
 import com.yj.sryx.view.game.RuleActivity;
 import com.yj.sryx.view.im.ImActivity;
+import com.yj.sryx.view.im.ImService;
 import com.zhy.autolayout.config.AutoLayoutConifg;
 
 import java.util.HashMap;

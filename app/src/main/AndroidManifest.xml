@@ -205,10 +205,22 @@
             android:name="JPUSH_APPKEY"
             android:value="40cf4209576fc7f9e65276c0"/>
 
-        <activity android:name=".view.im.ImActivity">
-        </activity>
-        <activity android:name=".view.im.SearchFriendActivity">
-        </activity>
+        <activity
+            android:name=".view.im.ImActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.im.SearchFriendActivity"
+            android:screenOrientation="portrait"/>
+
+        <service
+            android:name=".view.im.ImService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
+        <activity
+            android:name=".view.im.ChatActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -49,6 +49,7 @@ import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.utils.TransitionHelper;
 import com.yj.sryx.view.BaseActivity;
 import com.yj.sryx.view.im.ImActivity;
+import com.yj.sryx.view.im.ImService;
 import com.yj.sryx.widget.CircleImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -121,6 +122,7 @@ public class MainActivity extends BaseActivity {
             public void onSuccess(Integer integer) {
                 LogUtils.logout("登录Openfire成功！");
                 ToastUtils.showLongToast(MainActivity.this, "登录Openfire成功！");
+                startService(new Intent(MainActivity.this, ImService.class));
             }
 
             @Override
