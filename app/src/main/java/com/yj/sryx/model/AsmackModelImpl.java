@@ -388,7 +388,7 @@ public class AsmackModelImpl implements AsmackModel {
             }
         })
         .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
-        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+//        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
         .subscribe(new ProgressSubscriber(callback, mContext));
     }
 

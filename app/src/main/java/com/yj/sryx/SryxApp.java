@@ -2,13 +2,13 @@ package com.yj.sryx;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.yj.sryx.common.Theme;
-import com.yj.sryx.model.AsmackModel;
-import com.yj.sryx.model.AsmackModelImpl;
+import com.yj.sryx.model.beans.DaoMaster;
+import com.yj.sryx.model.beans.DaoSession;
 import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.view.game.CreateGameFragment;
 import com.yj.sryx.view.game.GameDetailActivity;
@@ -21,7 +21,6 @@ import com.yj.sryx.view.game.PrepareGameActivity;
 import com.yj.sryx.view.game.QrCodeScanActivity;
 import com.yj.sryx.view.game.RuleActivity;
 import com.yj.sryx.view.im.ImActivity;
-import com.yj.sryx.view.im.ImService;
 import com.zhy.autolayout.config.AutoLayoutConifg;
 
 import java.util.HashMap;
@@ -34,7 +33,8 @@ import cn.jpush.android.api.JPushInterface;
 public class SryxApp extends Application {
     public static Context sContext;
     public static IWXAPI sWxApi;
-    public static WxUser sWxUser;
+    public static WxUser sWxUser;;
+    public static DaoSession sDaoSession;
     public static HashMap<String, Theme> sActivityThemeMap;
 
     @Override
@@ -49,6 +49,15 @@ public class SryxApp extends Application {
         initWxApi();
         //初始化主题map
         initThemeMap();
+        //初始化greendao数据库
+        setDatabase();
+    }
+
+    private void setDatabase() {
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "sryx-db", null);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        // 注意：该数据库连接属于 DaoMaster，所以多个 Session 指的是相同的数据库连接。
+        sDaoSession = new DaoMaster(db).newSession();
     }
 
     private void initThemeMap() {

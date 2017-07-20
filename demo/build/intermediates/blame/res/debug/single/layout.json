@@ -120,12 +120,12 @@
         "source": "D:\\code\\Sryx\\demo\\res\\layout\\activity_get_black_list.xml"
     },
     {
-        "merged": "D:\\code\\Sryx\\demo\\build\\intermediates\\res\\merged\\debug\\layout\\activity_create_send_custom_message.xml",
-        "source": "D:\\code\\Sryx\\demo\\res\\layout\\activity_create_send_custom_message.xml"
-    },
-    {
         "merged": "D:\\code\\Sryx\\demo\\build\\intermediates\\res\\merged\\debug\\layout\\activity_conversation_info.xml",
         "source": "D:\\code\\Sryx\\demo\\res\\layout\\activity_conversation_info.xml"
+    },
+    {
+        "merged": "D:\\code\\Sryx\\demo\\build\\intermediates\\res\\merged\\debug\\layout\\activity_create_send_custom_message.xml",
+        "source": "D:\\code\\Sryx\\demo\\res\\layout\\activity_create_send_custom_message.xml"
     },
     {
         "merged": "D:\\code\\Sryx\\demo\\build\\intermediates\\res\\merged\\debug\\layout\\activity_create_image_content_file.xml",

@@ -105,7 +105,7 @@ public class MainActivity extends BaseActivity {
         mAsmackModel = new AsmackModelImpl(this);
         initJpush();
         initLayout();
-        if(!getIntent().getExtras().getBoolean(IS_ALREADY_LOGIN, false)){
+        if(null != getIntent().getExtras() && !getIntent().getExtras().getBoolean(IS_ALREADY_LOGIN, false)) {
             openfireLogin();
         }
     }

@@ -13,6 +13,8 @@ import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.RxBus;
 import com.yj.sryx.manager.XmppConnSingleton;
 import com.yj.sryx.model.beans.ChatMessage;
+import com.yj.sryx.model.beans.ChatMessageDao;
+import com.yj.sryx.utils.ActivityUtils;
 import com.yj.sryx.utils.CountDownTimerUtil;
 import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.view.game.MainActivity;
@@ -36,12 +38,12 @@ import cn.jpush.android.api.JPushInterface;
 
 public class ImService extends Service {
     private static final int NOTIFICATION_ID_1 = 1;
+    private static final int NOTIFICATION_ID_2 = 2;
     private Context mContext;
     private XMPPConnection mConnection;
     private Roster mRoster;
-    private NotificationManager myManager = null;
-    private Notification myNotification;
-
+    private NotificationManager mNotiManager = null;
+    private ChatMessageDao mChatMessageDao;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -49,7 +51,8 @@ public class ImService extends Service {
         mConnection = XmppConnSingleton.getInstance();
         mRoster = mConnection.getRoster();
         mRoster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
-        myManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mNotiManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mChatMessageDao = SryxApp.sDaoSession.getChatMessageDao();
         addPacketListener();
         addMessageListener();
     }
@@ -100,21 +103,28 @@ public class ImService extends Service {
                         LogUtils.logout("From   : "+message.getFrom());
                         LogUtils.logout("To     : "+message.getTo());
                         LogUtils.logout("Type   : "+message.getType());
-                        LogUtils.logout("Sub    : "+message.toXML());
                         LogUtils.logout("body   : "+message.getBody());
                         ChatMessage chatMessage = new ChatMessage();
                         chatMessage.setBody(message.getBody());
-                        chatMessage.setFrom(message.getFrom());
+                        chatMessage.setFrom(message.getFrom().split("/")[0]);
                         chatMessage.setTo(message.getTo());
-                        RxBus.getInstance().post(chatMessage);
+                        chatMessage.setTime(System.currentTimeMillis());
+                        chatMessage.setIsSendOk(true);
+                        chatMessage.setIsRead(false);
+                        mChatMessageDao.insert(chatMessage);
+                        if(ActivityUtils.isTopActivity(mContext, ChatActivity.class.getName()) && message.getFrom().contains(ChatActivity.OTHER_USER_ID)) {
+                            RxBus.getInstance().post(chatMessage);
+                        }else {
+                            sendTopMsgNotification();
+                        }
                     }
                 });
             }
         });
     }
 
-    private void sendAddFriendApplyNotification() {
 
+    private void sendAddFriendApplyNotification() {
         PendingIntent pi = PendingIntent.getActivity(
                 mContext,
                 100,
@@ -122,8 +132,8 @@ public class ImService extends Service {
                 PendingIntent.FLAG_CANCEL_CURRENT
         );
 
-        Notification.Builder myBuilder = new Notification.Builder(mContext);
-        myBuilder.setContentTitle("天黑请闭眼")
+        Notification.Builder builder = new Notification.Builder(mContext);
+        builder.setContentTitle("天黑请闭眼")
                 .setContentText("您收到了联系人申请")
                 .setTicker("您收到新的消息")
                 .setSmallIcon(R.mipmap.sryx_logo)
@@ -131,13 +141,29 @@ public class ImService extends Service {
                 .setAutoCancel(true)//点击后取消
                 .setWhen(System.currentTimeMillis())//设置通知时间
                 .setPriority(Notification.PRIORITY_HIGH)//高优先级
-                //android5.0加入了一种新的模式Notification的显示等级，共有三种：
-                //VISIBILITY_PUBLIC  只有在没有锁屏时会显示通知
-                //VISIBILITY_PRIVATE 任何情况都会显示通知
-                //VISIBILITY_SECRET  在安全锁和没有锁屏的情况下显示通知
-                .setContentIntent(pi);  //3.关联PendingIntent
-        myNotification = myBuilder.build();
-        myManager.notify(NOTIFICATION_ID_1, myNotification);
+                .setContentIntent(pi);
+        mNotiManager.notify(NOTIFICATION_ID_1, builder.build());
+    }
+
+    private void sendTopMsgNotification() {
+        PendingIntent pi = PendingIntent.getActivity(
+                mContext,
+                100,
+                new Intent(mContext, MainActivity.class),
+                PendingIntent.FLAG_CANCEL_CURRENT
+        );
+
+        Notification.Builder builder = new Notification.Builder(mContext);
+        builder.setContentTitle("天黑请闭眼")
+                .setContentText("您收到了新消息")
+                .setTicker("您收到新的消息")
+                .setSmallIcon(R.mipmap.sryx_logo)
+                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+                .setAutoCancel(true)//点击后取消
+                .setWhen(System.currentTimeMillis())//设置通知时间
+                .setPriority(Notification.PRIORITY_HIGH)//高优先级
+                .setContentIntent(pi);
+        mNotiManager.notify(NOTIFICATION_ID_2, builder.build());
     }
 
     @Override

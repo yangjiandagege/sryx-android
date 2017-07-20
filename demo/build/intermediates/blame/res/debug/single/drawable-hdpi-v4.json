@@ -4,15 +4,7 @@
         "source": "D:\\code\\Sryx\\demo\\res\\drawable-hdpi\\jpush_richpush_btn_selector.xml"
     },
     {
-        "merged": "D:\\code\\Sryx\\demo\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi-v4\\jpush_ic_richpush_actionbar_back.png",
-        "source": "D:\\code\\Sryx\\demo\\res\\drawable-hdpi\\jpush_ic_richpush_actionbar_back.png"
-    },
-    {
         "merged": "D:\\code\\Sryx\\demo\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi-v4\\jpush_richpush_progressbar.xml",
         "source": "D:\\code\\Sryx\\demo\\res\\drawable-hdpi\\jpush_richpush_progressbar.xml"
-    },
-    {
-        "merged": "D:\\code\\Sryx\\demo\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi-v4\\jpush_ic_richpush_actionbar_divider.png",
-        "source": "D:\\code\\Sryx\\demo\\res\\drawable-hdpi\\jpush_ic_richpush_actionbar_divider.png"
     }
 ]
