@@ -1,19 +1,26 @@
 package com.yj.sryx.view.im;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 
 import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.RxBus;
 import com.yj.sryx.manager.XmppConnSingleton;
+import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.AsmackModel;
+import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.beans.ChatMessage;
 import com.yj.sryx.model.beans.ChatMessageDao;
+import com.yj.sryx.model.beans.ChatSession;
+import com.yj.sryx.model.beans.ChatSessionDao;
 import com.yj.sryx.utils.ActivityUtils;
 import com.yj.sryx.utils.CountDownTimerUtil;
 import com.yj.sryx.utils.LogUtils;
@@ -27,12 +34,18 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.offline.OfflineMessageManager;
+import org.jivesoftware.smackx.vcardtemp.packet.VCard;
+
+import java.util.Iterator;
+import java.util.List;
 
 import cn.jpush.android.api.JPushInterface;
 
@@ -44,6 +57,9 @@ public class ImService extends Service {
     private Roster mRoster;
     private NotificationManager mNotiManager = null;
     private ChatMessageDao mChatMessageDao;
+    private AsmackModel mAsmackModel;
+    private ChatSessionDao mChatSessionDao;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -53,8 +69,38 @@ public class ImService extends Service {
         mRoster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
         mNotiManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mChatMessageDao = SryxApp.sDaoSession.getChatMessageDao();
+        mChatSessionDao = SryxApp.sDaoSession.getChatSessionDao();
+        mAsmackModel = new AsmackModelImpl(this);
         addPacketListener();
         addMessageListener();
+        initHeartBeat();
+        initOfflineMessage();
+    }
+
+    private void initOfflineMessage() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OfflineMessageManager offlineManager = new OfflineMessageManager(mConnection);
+                    List<Message> offlineMessageList = offlineManager.getMessages();
+                    for(int i = 0; i < offlineMessageList.size(); i++){
+                        ChatMessage chatMessage = new ChatMessage();
+                        chatMessage.setBody(offlineMessageList.get(i).getBody());
+                        chatMessage.setFrom(offlineMessageList.get(i).getFrom().split("/")[0]);
+                        chatMessage.setTo(offlineMessageList.get(i).getTo());
+                        chatMessage.setTime(System.currentTimeMillis());
+                        chatMessage.setIsSendOk(true);
+                        chatMessage.setIsRead(false);
+                        mChatMessageDao.insert(chatMessage);
+                    }
+                    offlineManager.deleteMessages();
+                    mConnection.sendPacket(new Presence(Presence.Type.available));
+                } catch (XMPPException | SmackException.NotConnectedException | SmackException.NoResponseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void addPacketListener() {
@@ -104,14 +150,39 @@ public class ImService extends Service {
                         LogUtils.logout("To     : "+message.getTo());
                         LogUtils.logout("Type   : "+message.getType());
                         LogUtils.logout("body   : "+message.getBody());
+                        String fromUser = message.getFrom().split("/")[0];
+
                         ChatMessage chatMessage = new ChatMessage();
                         chatMessage.setBody(message.getBody());
-                        chatMessage.setFrom(message.getFrom().split("/")[0]);
+                        chatMessage.setFrom(fromUser);
                         chatMessage.setTo(message.getTo());
                         chatMessage.setTime(System.currentTimeMillis());
                         chatMessage.setIsSendOk(true);
                         chatMessage.setIsRead(false);
                         mChatMessageDao.insert(chatMessage);
+
+                        ChatSession chatSession = mChatSessionDao.load(fromUser);
+                        if(null == chatSession){
+                            chatSession = new ChatSession();
+                            chatSession.setSessionId(fromUser);
+                            VCard vCard = new VCard();
+                            try {
+                                vCard.load(mConnection, fromUser);
+                                chatSession.setSessionName(vCard.getNickName());
+                                chatSession.setLastTime(System.currentTimeMillis());
+                                chatSession.setLastBody(message.getBody());
+                                chatSession.setUnreadCount(1);
+                                mChatSessionDao.insert(chatSession);
+                            } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
+                                e.printStackTrace();
+                            }
+                        }else {
+                            chatSession.setLastTime(System.currentTimeMillis());
+                            chatSession.setLastBody(message.getBody());
+                            chatSession.setUnreadCount(chatSession.getUnreadCount()+1);
+                            mChatSessionDao.update(chatSession);
+                        }
+
                         if(ActivityUtils.isTopActivity(mContext, ChatActivity.class.getName()) && message.getFrom().contains(ChatActivity.OTHER_USER_ID)) {
                             RxBus.getInstance().post(chatMessage);
                         }else {
@@ -165,6 +236,32 @@ public class ImService extends Service {
                 .setContentIntent(pi);
         mNotiManager.notify(NOTIFICATION_ID_2, builder.build());
     }
+
+    private void initHeartBeat() {
+        mHandler.postDelayed(mTask,3*000);
+    }
+
+    private Handler mHandler = new Handler();
+
+    private Runnable mTask =new Runnable() {
+        public void run() {
+            mHandler.postDelayed(this,3*1000);//设置延迟时间，此处是5秒
+            LogUtils.logout("asmack reconect...!");
+            if(!mConnection.isConnected() || !mConnection.isAuthenticated()){
+                mAsmackModel.login(SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        LogUtils.logout("asmack reconect ok!");
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                        LogUtils.logout("asmack reconect fail!");
+                    }
+                });
+            }
+        }
+    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

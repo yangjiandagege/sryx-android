@@ -1,21 +1,17 @@
 package com.yj.sryx.model;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.text.Editable;
 import android.util.Log;
-import android.widget.ImageView;
 
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.XmppConnSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.ProgressSubscriber;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
-import com.yj.sryx.model.beans.Contact;
+import com.yj.sryx.model.beans.SearchContact;
 import com.yj.sryx.utils.FormatTools;
 import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.ToastUtils;
-import com.yj.sryx.view.im.ImActivity;
 
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.Chat;
@@ -24,15 +20,14 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.XMPPTCPConnection;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smack.util.Base64;
-import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.offline.OfflineMessageManager;
 import org.jivesoftware.smackx.search.ReportedData;
 import org.jivesoftware.smackx.search.UserSearchManager;
 import org.jivesoftware.smackx.vcardtemp.VCardManager;
@@ -54,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -89,6 +83,7 @@ public class AsmackModelImpl implements AsmackModel {
                     ConnectionConfiguration config = new ConnectionConfiguration(HOST, PORT);
                     config.setReconnectionAllowed(true);
                     config.setDebuggerEnabled(true);
+                    config.setSendPresence(false);
                     // 关闭安全模式
                     config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
                     XMPPConnection connection = new XMPPTCPConnection(config);
@@ -137,7 +132,6 @@ public class AsmackModelImpl implements AsmackModel {
                         } finally {
                             subscriber.onCompleted();
                         }
-                        LogUtils.logout("");
                     }
                 })
                 .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
@@ -147,7 +141,6 @@ public class AsmackModelImpl implements AsmackModel {
 
             @Override
             public void onError(String msg) {
-                LogUtils.logout("");
                 ToastUtils.showLongToast(mContext, "连接失败"+msg);
             }
         });
@@ -216,13 +209,13 @@ public class AsmackModelImpl implements AsmackModel {
     }
 
     @Override
-    public void searchFriends(final String keyword, final SubscriberOnNextListener<List<Contact>> callback) {
+    public void searchFriends(final String keyword, final SubscriberOnNextListener<List<SearchContact>> callback) {
         final XMPPConnection connection = XmppConnSingleton.getInstance();
-        Observable.create(new Observable.OnSubscribe<List<Contact>>() {
+        Observable.create(new Observable.OnSubscribe<List<SearchContact>>() {
             @Override
-            public void call(Subscriber<? super List<Contact>> subscriber) {
+            public void call(Subscriber<? super List<SearchContact>> subscriber) {
                 try {
-                    List<Contact> contactList = new ArrayList<Contact>();
+                    List<SearchContact> contactList = new ArrayList<SearchContact>();
                     // 创建搜索
                     UserSearchManager searchManager = new UserSearchManager(connection);
                     // 获取搜索表单
@@ -237,7 +230,7 @@ public class AsmackModelImpl implements AsmackModel {
                     // 遍历结果列
                     for (ReportedData.Row row : data.getRows()) {
                         String jid = row.getValues("jid").get(0);
-                        Contact contact = new Contact();
+                        SearchContact contact = new SearchContact();
                         VCard vCard = new VCard();
                         vCard.load(connection, jid);
                         contact.account = jid;
@@ -324,7 +317,6 @@ public class AsmackModelImpl implements AsmackModel {
     @Override
     public void addFriend(final String userName, final String name, SubscriberOnNextListener<Integer> callback) {
         final XMPPConnection connection = XmppConnSingleton.getInstance();
-        LogUtils.logout(userName+" "+name);
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
@@ -380,6 +372,29 @@ public class AsmackModelImpl implements AsmackModel {
                     chat.sendMessage(message);
                     subscriber.onNext(0);
                 } catch (XMPPException | SmackException.NotConnectedException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+//        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    @Override
+    public void getOfflineMessages(SubscriberOnNextListener<List<Message>> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<List<Message>>() {
+            @Override
+            public void call(Subscriber<? super List<Message>> subscriber) {
+                try {
+                    OfflineMessageManager offlineManager = new OfflineMessageManager(connection);
+                    List<Message> offlineMessageList = offlineManager.getMessages();
+                    subscriber.onNext(offlineMessageList);
+                } catch (XMPPException | SmackException.NotConnectedException | SmackException.NoResponseException e) {
                     subscriber.onError(e);
                     e.printStackTrace();
                 } finally {

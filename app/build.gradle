@@ -101,4 +101,5 @@ dependencies {
     //    compile 'com.isanwenyu.highlight:highlight:1.8.0'
     // greendao
     compile 'org.greenrobot:greendao:3.2.2'
+    compile 'com.github.promeg:tinypinyin:1.0.0'
 }

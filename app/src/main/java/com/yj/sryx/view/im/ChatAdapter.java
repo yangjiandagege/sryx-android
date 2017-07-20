@@ -71,7 +71,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public int getItemViewType(int position) {
-        LogUtils.logout(" "+ (mMessageList.get(position).getFrom().contains(SryxApp.sWxUser.getOpenid())?ITEM_ME:ITEM_OTHER));
         return mMessageList.get(position).getFrom().contains(SryxApp.sWxUser.getOpenid())?ITEM_ME:ITEM_OTHER;
     }
 

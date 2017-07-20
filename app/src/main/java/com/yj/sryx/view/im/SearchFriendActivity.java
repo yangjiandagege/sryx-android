@@ -12,7 +12,7 @@ import com.yj.sryx.manager.XmppConnSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.AsmackModel;
 import com.yj.sryx.model.AsmackModelImpl;
-import com.yj.sryx.model.beans.Contact;
+import com.yj.sryx.model.beans.SearchContact;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.widget.SearchEditText;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
@@ -33,8 +33,8 @@ public class SearchFriendActivity extends AppCompatActivity {
     RecyclerView rvListFriend;
 
     private AsmackModel mAsmackModel;
-    private List<Contact> mContactList;
-    private CommonAdapter<Contact> mAdapter;
+    private List<SearchContact> mContactList;
+    private CommonAdapter<SearchContact> mAdapter;
     private XMPPConnection mConnection;
 
     @Override
@@ -50,9 +50,9 @@ public class SearchFriendActivity extends AppCompatActivity {
     private void initLayout() {
         mContactList = new ArrayList<>();
         rvListFriend.addItemDecoration(new RecycleViewDivider(this, LinearLayoutManager.HORIZONTAL));
-        mAdapter = new CommonAdapter<Contact>(this, R.layout.item_list_user_search, mContactList) {
+        mAdapter = new CommonAdapter<SearchContact>(this, R.layout.item_list_user_search, mContactList) {
             @Override
-            protected void convert(final ViewHolder holder, final Contact contact, int position) {
+            protected void convert(final ViewHolder holder, final SearchContact contact, int position) {
                 if (contact.getAvatar() != null) {
                     holder.setImageDrawable(R.id.iv_header, contact.getAvatar());
                 } else {
@@ -84,9 +84,9 @@ public class SearchFriendActivity extends AppCompatActivity {
         edtSearchFriend.setOnSearchClickListener(new SearchEditText.OnSearchClickListener() {
             @Override
             public void onSearchClick(View view, String keyword) {
-                mAsmackModel.searchFriends(keyword, new SubscriberOnNextListener<List<Contact>>() {
+                mAsmackModel.searchFriends(keyword, new SubscriberOnNextListener<List<SearchContact>>() {
                     @Override
-                    public void onSuccess(List<Contact> contacts) {
+                    public void onSuccess(List<SearchContact> contacts) {
                         mContactList.clear();
                         mContactList.addAll(contacts);
                         mAdapter.notifyDataSetChanged();

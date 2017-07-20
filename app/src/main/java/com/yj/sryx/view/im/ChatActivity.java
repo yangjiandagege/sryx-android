@@ -21,7 +21,11 @@ import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.AsmackModel;
 import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.beans.ChatMessage;
+import com.yj.sryx.model.beans.ChatMessageDao;
 import com.yj.sryx.model.beans.ChatMessageDao.Properties;
+import com.yj.sryx.model.beans.ChatSession;
+import com.yj.sryx.model.beans.ChatSessionDao;
+import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.widget.AcceBar;
 
@@ -58,6 +62,8 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter mAdapter;
     private Drawable mMeHeaderDrawable;
     private Drawable mOtherHeaderDrawable;
+    private ChatMessageDao mChatMessageDao;
+    private ChatSessionDao mChatSessionDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +77,8 @@ public class ChatActivity extends AppCompatActivity {
         mMeUser = SryxApp.sWxUser.getOpenid() + "@" + XmppConnSingleton.getInstance().getServiceName();
         OTHER_USER_ID = mOtherUser;
         mAsmackModel = new AsmackModelImpl(this);
-
+        mChatMessageDao = SryxApp.sDaoSession.getChatMessageDao();
+        mChatSessionDao = SryxApp.sDaoSession.getChatSessionDao();
         // 改变输入框
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
@@ -84,9 +91,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private void initData() {
         mMsgList = new ArrayList<>();
-        QueryBuilder<ChatMessage> qb = SryxApp.sDaoSession.getChatMessageDao().queryBuilder();
-        qb.or(qb.and(Properties.From.eq(mOtherUser), Properties.To.eq(mMeUser)),
-                qb.and(Properties.From.eq(mMeUser), Properties.To.eq(mOtherUser)));
+        QueryBuilder<ChatMessage> qb = mChatMessageDao.queryBuilder();
+//        qb.whereOr(qb.and(Properties.From.eq(mOtherUser), Properties.To.eq(mMeUser)),
+//                qb.and(Properties.From.eq(mMeUser), Properties.To.eq(mOtherUser)));
+        qb.whereOr(Properties.From.eq(mOtherUser), Properties.To.eq(mOtherUser));
         mMsgList.addAll(qb.list());
     }
 
@@ -128,22 +136,39 @@ public class ChatActivity extends AppCompatActivity {
         btnSendMsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAsmackModel.sendMessage(mOtherUser, mOtherName, edtMsgContent.getText().toString(), null, new SubscriberOnNextListener<Integer>() {
+                final String content = edtMsgContent.getText().toString();
+                final ChatMessage chatMessage = new ChatMessage();
+                mAsmackModel.sendMessage(mOtherUser, mOtherName, content, null, new SubscriberOnNextListener<Integer>() {
                     @Override
                     public void onSuccess(Integer integer) {
-                        ChatMessage chatMessage = new ChatMessage();
                         chatMessage.setFrom(mMeUser);
                         chatMessage.setTo(mOtherUser);
-                        chatMessage.setBody(edtMsgContent.getText().toString());
+                        chatMessage.setBody(content);
                         chatMessage.setTime(System.currentTimeMillis());
                         chatMessage.setIsSendOk(true);
                         chatMessage.setIsRead(true);
                         mMsgList.add(chatMessage);
+                        mChatMessageDao.insert(chatMessage);
+
+                        ChatSession chatSession = mChatSessionDao.load(mOtherUser);
+                        if(null == chatSession){
+                            chatSession = new ChatSession();
+                            chatSession.setSessionId(mOtherUser);
+                            chatSession.setSessionName(mOtherName);
+                            chatSession.setLastTime(System.currentTimeMillis());
+                            chatSession.setLastBody(content);
+                            chatSession.setUnreadCount(1);
+                            mChatSessionDao.insert(chatSession);
+                        }else {
+                            chatSession.setLastTime(System.currentTimeMillis());
+                            chatSession.setLastBody(content);
+                            chatSession.setUnreadCount(chatSession.getUnreadCount()+1);
+                            mChatSessionDao.update(chatSession);
+                        }
                     }
 
                     @Override
                     public void onError(String msg) {
-                        ToastUtils.showLongToast(ChatActivity.this, "发送消息失败！");
                     }
                 });
                 mAdapter.notifyItemInserted(mAdapter.getItemCount());
@@ -160,44 +185,10 @@ public class ChatActivity extends AppCompatActivity {
             public void call(ChatMessage s) {
                 mMsgList.add(s);
                 mAdapter.notifyDataSetChanged();
+                rvChat.smoothScrollToPosition(mAdapter.getItemCount());
             }
         });
     }
-
-    /**
-     * EditText获取焦点并显示软键盘
-     */
-    public void showSoftInputFromWindow(Activity activity, EditText editText) {
-        editText.setFocusable(true);
-        editText.setFocusableInTouchMode(true);
-        editText.requestFocus();
-//        activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-    }
-
-//    @OnClick(R.id.btn_send_msg)
-//    public void onClick() {
-//        mAsmackModel.sendMessage(mOtherUser, mOtherName, edtMsgContent.getText().toString(), null, new SubscriberOnNextListener<Integer>() {
-//            @Override
-//            public void onSuccess(Integer integer) {
-//                ChatMessage chatMessage = new ChatMessage();
-//                chatMessage.setFrom(mMeUser);
-//                chatMessage.setTo(mOtherUser);
-//                chatMessage.setBody(edtMsgContent.getText().toString());
-//                chatMessage.setTime(System.currentTimeMillis());
-//                chatMessage.setIsSendOk(true);
-//                chatMessage.setIsRead(true);
-////                mMsgList.add(chatMessage);
-////                mAdapter.notifyItemInserted(mAdapter.getItemCount());
-////                rvChat.smoothScrollToPosition(mAdapter.getItemCount() - 1);
-////                showSoftInputFromWindow(ChatActivity.this, edtMsgContent);
-//            }
-//
-//            @Override
-//            public void onError(String msg) {
-//                ToastUtils.showLongToast(ChatActivity.this, "发送消息失败！");
-//            }
-//        });
-//    }
 
     @Override
     protected void onDestroy() {

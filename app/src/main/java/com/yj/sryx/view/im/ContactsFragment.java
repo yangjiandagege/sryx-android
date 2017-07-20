@@ -12,18 +12,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.yj.sryx.R;
-import com.yj.sryx.common.RecycleViewDivider;
-import com.yj.sryx.manager.XmppConnSingleton;
+import com.yj.sryx.common.DividerItemDecoration;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.AsmackModel;
 import com.yj.sryx.model.AsmackModelImpl;
-import com.yj.sryx.widget.adapterrv.CommonAdapter;
-import com.yj.sryx.widget.adapterrv.ViewHolder;
+import com.yj.sryx.model.beans.Contact;
+import com.yj.sryx.widget.indexlib.IndexBar.widget.IndexBar;
+import com.yj.sryx.widget.indexlib.suspension.SuspensionDecoration;
 
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +35,21 @@ import butterknife.ButterKnife;
  * Created by  on 2017/7/18.
  */
 
-public class ContactsFragment extends Fragment {
+public class ContactsFragment extends Fragment implements ContactsAdapter.OnItemClickListener{
+    private static final String INDEX_STRING_TOP = "↑";
+
     @Bind(R.id.rv_list_friend)
     RecyclerView rvListFriend;
+    @Bind(R.id.indexBar)
+    IndexBar indexBar;
+    @Bind(R.id.tvSideBarHint)
+    TextView tvSideBarHint;
     private Activity mActivity;
     private AsmackModel mAsmackModel;
-    private List<RosterEntry> mRosterEntryList;
-    private CommonAdapter<RosterEntry> mAdapter;
-    private XMPPConnection mConnection;
+    private List<Contact> mContactList;
+    private ContactsAdapter mAdapter;
+    private SuspensionDecoration mDecoration;
+    private LinearLayoutManager mLayoutManager;
 
     @Nullable
     @Override
@@ -51,8 +58,9 @@ public class ContactsFragment extends Fragment {
         ButterKnife.bind(this, view);
         mActivity = getActivity();
         mAsmackModel = new AsmackModelImpl(mActivity);
-        mConnection = XmppConnSingleton.getInstance();
-        mRosterEntryList = new ArrayList<>();
+        mContactList = new ArrayList<>();
+        mContactList.add((Contact)new Contact("新的朋友", "新的朋友", true).setBaseIndexTag(INDEX_STRING_TOP));
+        mContactList.add((Contact)new Contact("群聊", "群聊", true).setBaseIndexTag(INDEX_STRING_TOP));
         initLayout();
         getAllEntries();
         return view;
@@ -62,8 +70,14 @@ public class ContactsFragment extends Fragment {
         mAsmackModel.getAllRosterEntries(new SubscriberOnNextListener<List<RosterEntry>>() {
             @Override
             public void onSuccess(List<RosterEntry> rosterEntries) {
-                mRosterEntryList.clear();
-                mRosterEntryList.addAll(rosterEntries);
+                for (int i = 0; i < rosterEntries.size(); i++) {
+                    Contact contact = new Contact(rosterEntries.get(i).getUser(), rosterEntries.get(i).getName(), false);
+                    mContactList.add(contact);
+                }
+
+                indexBar.setmSourceDatas(mContactList)//设置数据
+                        .invalidate();
+                mDecoration.setmDatas(mContactList);
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -75,49 +89,40 @@ public class ContactsFragment extends Fragment {
     }
 
     private void initLayout() {
-        rvListFriend.addItemDecoration(new RecycleViewDivider(mActivity, LinearLayoutManager.HORIZONTAL));
-        mAdapter = new CommonAdapter<RosterEntry>(mActivity, R.layout.item_list_contact, mRosterEntryList) {
-            @Override
-            protected void convert(final ViewHolder holder, final RosterEntry entry, int position) {
-                holder.setText(R.id.tv_name, entry.getName());
-                mAsmackModel.getHeaderPic(entry.getUser(), new HeaderPicSetListener(position, (ImageView) holder.getView(R.id.iv_header)));
-                holder.setOnClickListener(R.id.ll_contact, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(mActivity, ChatActivity.class);
-                        intent.putExtra(ChatActivity.EXTRA_USER, entry.getUser());
-                        intent.putExtra(ChatActivity.EXTRA_NAME, entry.getName());
-                        startActivity(intent);
-                    }
-                });
-            }
-        };
+        rvListFriend.setLayoutManager(mLayoutManager = new LinearLayoutManager(mActivity));
+        mAdapter = new ContactsAdapter(mActivity, mContactList);
+        mAdapter.setOnItemClickListener(this);
         rvListFriend.setAdapter(mAdapter);
-    }
+        rvListFriend.addItemDecoration(mDecoration = new SuspensionDecoration(mActivity, mContactList));
+        rvListFriend.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL_LIST));
 
-    class HeaderPicSetListener implements SubscriberOnNextListener<Drawable>{
-        int position;
-        ImageView imageHeaderPic;
-
-        public HeaderPicSetListener(int position, ImageView imageView) {
-            this.position = position;
-            this.imageHeaderPic = imageView;
-        }
-
-        @Override
-        public void onSuccess(Drawable drawable) {
-            imageHeaderPic.setImageDrawable(drawable);
-        }
-
-        @Override
-        public void onError(String msg) {
-
-        }
+        //indexbar初始化
+        indexBar.setmPressedShowTextView(tvSideBarHint)//设置HintTextView
+                .setNeedRealIndex(true)//设置需要真实的索引
+                .setmLayoutManager(mLayoutManager);//设置RecyclerView的LayoutManager
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    @Override
+    public void OnNewFriendsClick() {
+
+    }
+
+    @Override
+    public void OnGroupChatClick() {
+
+    }
+
+    @Override
+    public void OnItemClick(int position) {
+        Intent intent = new Intent(mActivity, ChatActivity.class);
+        intent.putExtra(ChatActivity.EXTRA_USER, mContactList.get(position).getUser());
+        intent.putExtra(ChatActivity.EXTRA_NAME, mContactList.get(position).getName());
+        startActivity(intent);
     }
 }
