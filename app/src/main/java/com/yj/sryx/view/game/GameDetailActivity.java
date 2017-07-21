@@ -1,14 +1,17 @@
 package com.yj.sryx.view.game;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.yj.sryx.R;
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.common.GrayscaleTransformation;
 import com.yj.sryx.common.RecycleViewDivider;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
@@ -83,7 +86,7 @@ public class GameDetailActivity extends BaseActivity {
         rvListRolesJustice.setAdapter(mJusticeAdapter);
     }
 
-    private void setRoleItemView(ViewHolder holder, Role role, int position) {
+    private void setRoleItemView(ViewHolder holder, final Role role, int position) {
         holder.setText(R.id.tv_nickname, role.getPlayerNickName());
         holder.setText(R.id.tv_role, role.getRoleName());
         holder.setVisible(R.id.iv_kill_out, false);
@@ -108,6 +111,14 @@ public class GameDetailActivity extends BaseActivity {
                 break;
         }
         setRoleHeaderPic(role, holder);
+        holder.setOnClickListener(R.id.iv_header, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GameDetailActivity.this, PlayerInfoActivity.class);
+                intent.putExtra(PlayerInfoActivity.EXTRAS_PLAYER_ID, role.getPlayerId());
+                startActivity(intent);
+            }
+        });
     }
 
     private void setRoleHeaderPic(Role role, ViewHolder holder) {

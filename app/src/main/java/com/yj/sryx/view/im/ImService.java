@@ -17,6 +17,8 @@ import com.yj.sryx.manager.XmppConnSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.AsmackModel;
 import com.yj.sryx.model.AsmackModelImpl;
+import com.yj.sryx.model.OpenfireLoginModel;
+import com.yj.sryx.model.OpenfireLoginModelImpl;
 import com.yj.sryx.model.beans.ChatMessage;
 import com.yj.sryx.model.beans.ChatMessageDao;
 import com.yj.sryx.model.beans.ChatSession;
@@ -57,25 +59,50 @@ public class ImService extends Service {
     private Roster mRoster;
     private NotificationManager mNotiManager = null;
     private ChatMessageDao mChatMessageDao;
-    private AsmackModel mAsmackModel;
     private ChatSessionDao mChatSessionDao;
-
+    private OpenfireLoginModel mOpenfireLoginModel;
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = this;
-        mConnection = XmppConnSingleton.getInstance();
-        mRoster = mConnection.getRoster();
-        mRoster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        LogUtils.logout("onStartCommand() executed");
         mNotiManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
         mChatMessageDao = SryxApp.sDaoSession.getChatMessageDao();
         mChatSessionDao = SryxApp.sDaoSession.getChatSessionDao();
-        mAsmackModel = new AsmackModelImpl(this);
-        addPacketListener();
-        addMessageListener();
-        initHeartBeat();
-        initOfflineMessage();
+
+        mOpenfireLoginModel = new OpenfireLoginModelImpl(this);
+        if(SryxApp.isOpenfireRegisterNeed) {
+            mOpenfireLoginModel.connectThenRegisterThenLogin(SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getNickname(), mLoginFinishListener);
+        }else {
+            mOpenfireLoginModel.connectThenLogin(SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getNickname(),mLoginFinishListener);
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
+
+    private SubscriberOnNextListener mLoginFinishListener = new SubscriberOnNextListener() {
+        @Override
+        public void onSuccess(Object o) {
+            mConnection = XmppConnSingleton.getInstance();
+            mRoster = mConnection.getRoster();
+            mRoster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+            addPacketListener();
+            addMessageListener();
+            initHeartBeat();
+            initOfflineMessage();
+        }
+
+        @Override
+        public void onError(String msg) {
+            LogUtils.logout(msg);
+        }
+    };
+
+
 
     private void initOfflineMessage() {
         new Thread(new Runnable() {
@@ -248,7 +275,7 @@ public class ImService extends Service {
             mHandler.postDelayed(this,3*1000);//设置延迟时间，此处是5秒
             LogUtils.logout("asmack reconect...!");
             if(!mConnection.isConnected() || !mConnection.isAuthenticated()){
-                mAsmackModel.login(SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
+                mOpenfireLoginModel.connectThenLogin(SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
                     @Override
                     public void onSuccess(Integer integer) {
                         LogUtils.logout("asmack reconect ok!");
@@ -263,11 +290,6 @@ public class ImService extends Service {
         }
     };
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        LogUtils.logout("onStartCommand() executed");
-        return super.onStartCommand(intent, flags, startId);
-    }
 
     @Override
     public void onDestroy() {

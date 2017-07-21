@@ -67,8 +67,8 @@ import static com.yj.sryx.SryxApp.sWxUser;
 
 public class MainActivity extends BaseActivity {
     public static final java.lang.String IS_ALREADY_LOGIN = "is_already_login";
-    @Bind(R.id.img_header)
-    CircleImageView imgHeader;
+    @Bind(R.id.iv_header)
+    CircleImageView ivHeader;
     @Bind(R.id.tv_nickname)
     TextView tvNickname;
     @Bind(R.id.acce_toolbar)
@@ -105,32 +105,13 @@ public class MainActivity extends BaseActivity {
         mAsmackModel = new AsmackModelImpl(this);
         initJpush();
         initLayout();
-        if(null != getIntent().getExtras() && !getIntent().getExtras().getBoolean(IS_ALREADY_LOGIN, false)) {
-            openfireLogin();
-        }
+        startService(new Intent(MainActivity.this, ImService.class));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkLastGameState();
-    }
-
-    private void openfireLogin(){
-        mAsmackModel.login(sWxUser.getOpenid(), sWxUser.getOpenid(), sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
-            @Override
-            public void onSuccess(Integer integer) {
-                LogUtils.logout("登录Openfire成功！");
-                ToastUtils.showLongToast(MainActivity.this, "登录Openfire成功！");
-                startService(new Intent(MainActivity.this, ImService.class));
-            }
-
-            @Override
-            public void onError(String msg) {
-                LogUtils.logout("登录Openfire失败！");
-                ToastUtils.showLongToast(MainActivity.this, "登录Openfire失败！");
-            }
-        });
+//        checkLastGameState();
     }
 
     private void checkLastGameState() {
@@ -266,7 +247,7 @@ public class MainActivity extends BaseActivity {
 
         Glide.with(this)
                 .load(SryxApp.sWxUser.getHeadimgurl())
-                .into(imgHeader);
+                .into(ivHeader);
         tvNickname.setText(SryxApp.sWxUser.getNickname());
     }
 
@@ -407,7 +388,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.rl_create_game, R.id.rl_join_game, R.id.rl_my_record, R.id.iv_friend})
+    @OnClick({R.id.rl_create_game, R.id.rl_join_game, R.id.rl_my_record, R.id.iv_friend, R.id.iv_header})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rl_create_game:
@@ -421,6 +402,11 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.iv_friend:
                 startActivity(new Intent(MainActivity.this, ImActivity.class));
+                break;
+            case R.id.iv_header:
+                Intent intent = new Intent(MainActivity.this, PlayerInfoActivity.class);
+                intent.putExtra(PlayerInfoActivity.EXTRAS_PLAYER_ID, SryxApp.sWxUser.getOpenid());
+                startActivity(intent);
                 break;
         }
     }

@@ -19,10 +19,6 @@ public class XmppConnSingleton {
     }
 
     public static void setXMPPConnection(XMPPConnection connection){
-        if(null == sXmppConnection) {
-            sXmppConnection = connection;
-        }else {
-            LogUtils.logout("XMPPConnection仅允许初始化一次！");
-        }
+        sXmppConnection = connection;
     }
 }

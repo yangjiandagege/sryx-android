@@ -8,7 +8,7 @@
     <include layout="@layout/toolbar_main"/>
 
     <com.yj.sryx.widget.CircleImageView
-        android:id="@+id/img_header"
+        android:id="@+id/iv_header"
         android:layout_width="180px"
         android:layout_height="180px"
         android:layout_gravity="center_horizontal"/>

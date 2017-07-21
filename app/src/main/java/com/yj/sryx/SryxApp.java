@@ -36,6 +36,7 @@ public class SryxApp extends Application {
     public static WxUser sWxUser;;
     public static DaoSession sDaoSession;
     public static HashMap<String, Theme> sActivityThemeMap;
+    public static boolean isOpenfireRegisterNeed = false;
 
     @Override
     public void onCreate() {

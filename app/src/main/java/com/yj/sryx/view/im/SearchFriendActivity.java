@@ -13,6 +13,7 @@ import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.AsmackModel;
 import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.beans.SearchContact;
+import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.ToastUtils;
 import com.yj.sryx.widget.SearchEditText;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
@@ -63,6 +64,7 @@ public class SearchFriendActivity extends AppCompatActivity {
                 holder.setOnClickListener(R.id.tv_add_friend, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        LogUtils.logout(contact.getName());
                         mAsmackModel.addFriend(contact.getAccount(), contact.getName(), new SubscriberOnNextListener<Integer>() {
                             @Override
                             public void onSuccess(Integer integer) {
