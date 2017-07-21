@@ -24,6 +24,7 @@ import com.yj.sryx.widget.indexlib.IndexBar.widget.IndexBar;
 import com.yj.sryx.widget.indexlib.suspension.SuspensionDecoration;
 
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.packet.RosterPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,9 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnItem
             public void onSuccess(List<RosterEntry> rosterEntries) {
                 for (int i = 0; i < rosterEntries.size(); i++) {
                     Contact contact = new Contact(rosterEntries.get(i).getUser(), rosterEntries.get(i).getName(), false);
-                    mContactList.add(contact);
+                    if(rosterEntries.get(i).getType() == RosterPacket.ItemType.both) {
+                        mContactList.add(contact);
+                    }
                 }
 
                 indexBar.setmSourceDatas(mContactList)//设置数据
@@ -110,7 +113,7 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnItem
 
     @Override
     public void OnNewFriendsClick() {
-
+        startActivity(new Intent(mActivity, NewFriendsActivity.class));
     }
 
     @Override

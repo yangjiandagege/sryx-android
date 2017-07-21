@@ -221,6 +221,10 @@
         <activity
             android:name=".view.im.ChatActivity"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.im.NewFriendsActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

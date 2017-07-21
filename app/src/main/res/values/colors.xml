@@ -13,7 +13,8 @@
     <color name="color_white">@android:color/white</color>
 
     <color name="text_light">@android:color/white</color>
-    <color name="text_dark">#616161</color>
+    <color name="text_dark">#606060</color>
+    <color name="text_selected">#1296db</color>
 
     <color name="theme_blue_background">#84ffff</color>
     <color name="theme_blue_primary">#03a9f4</color>

@@ -46,35 +46,9 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:background="@android:color/transparent"
-            android:textColor="@color/theme_green_primary_dark"
+            android:textColor="@color/text_selected"
+            android:layout_marginRight="16dp"
             android:textSize="18sp"
             android:text="发送"/>
     </RelativeLayout>
-
-    <!--<LinearLayout-->
-        <!--android:id="@+id/rl_input"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:background="@android:color/transparent">-->
-        <!--<EditText-->
-            <!--android:id="@+id/edt_msg_content"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_weight="5"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:inputType="textMultiLine"-->
-            <!--android:ems="10"-->
-            <!--android:hint="请输入消息内容..."/>-->
-        <!--<Button-->
-            <!--android:id="@+id/btn_send_msg"-->
-            <!--style="?android:attr/buttonStyleSmall"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_weight="1"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:text="发送"-->
-            <!--android:background="@android:color/transparent"-->
-            <!--android:textSize="18sp"-->
-            <!--android:textColor="#00b285"-->
-            <!--/>-->
-    <!--</LinearLayout>-->
 </RelativeLayout>

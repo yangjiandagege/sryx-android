@@ -3,91 +3,86 @@ package com.yj.sryx.view.im;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.FragmentTabHost;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TabHost;
+import android.widget.TabWidget;
+import android.widget.TextView;
 
 import com.yj.sryx.R;
-import com.yj.sryx.model.AsmackModel;
-import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.view.BaseActivity;
-import com.yj.sryx.view.game.GameRecordJudgeFragment;
-import com.yj.sryx.view.game.GameRecordPlayerFragment;
-import com.yj.sryx.view.game.GameRecordsFragment;
-import com.yj.sryx.view.game.QuizActivity;
+import com.yj.sryx.widget.AcceBar;
 
-import org.jivesoftware.smack.XMPPConnection;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class ImActivity extends BaseActivity {
-    public final static String TAB_SESSION = "消息";
-    public final static String TAB_CONTACT = "联系人";
-    @Bind(R.id.tabs)
-    TabLayout tabs;
-    @Bind(R.id.vp_content)
-    ViewPager vpContent;
+    @Bind(R.id.toolbar)
+    AcceBar toolbar;
+    @Bind(android.R.id.tabhost)
+    FragmentTabHost tabhost;
 
-    private Activity mActivity;
-    private List<String> mTabList;
-    private List<Fragment> mFragList;
-    private MyAdapter mAdapter;
+    private int selectedId = 0;
+
+    private String[] arrModelName =new String[]{"消息","联系人"};
+
+    private int[] arrImgNormal = new int[]{R.mipmap.message_normal,
+            R.mipmap.contacts_normal};
+
+    private int[] arrImgPressed = new int[]{R.mipmap.message_selected,
+            R.mipmap.contacts_selected};
+
+    private Class[] fragments = new Class[]{SessionsFragment.class, ContactsFragment.class};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_im);
         ButterKnife.bind(this);
-        mActivity = this;
         initFragment();
     }
 
     private void initFragment() {
-        mTabList = new ArrayList<>();
-        mTabList.add(TAB_SESSION);
-        mTabList.add(TAB_CONTACT);
+        tabhost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
+        for (int i = 0; i < fragments.length; i++){
+            tabhost.addTab(tabhost.newTabSpec(""+i).setIndicator(getIndicator(i)), fragments[i], null);
+        }
 
-        mFragList = new ArrayList<>();
-        mFragList.add(new SessionsFragment());
-        mFragList.add(new ContactsFragment());
+        tabhost.getTabWidget().setDividerDrawable(null);
 
-        mAdapter = new MyAdapter(getSupportFragmentManager(), mFragList, mTabList);
-        vpContent.setAdapter(mAdapter);
-        tabs.setupWithViewPager(vpContent);
+        tabhost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                int clickedId = Integer.valueOf(tabId);
+                tabClick(clickedId,true);
+                tabClick(selectedId,false);
+                selectedId = clickedId;
+                if(clickedId == 0){
+                    toolbar.setTitleText("消息");
+                }else {
+                    toolbar.setTitleText("联系人");
+                }
+            }
+        });
+
+        tabClick(selectedId,true);
+        tabhost.setCurrentTab(selectedId);
     }
 
-    private class MyAdapter extends FragmentPagerAdapter {
-        private List<Fragment> mFragmentList;
-        private List<String> mTabList;
-
-        MyAdapter(FragmentManager fm, List<Fragment> fragments, List<String> tabList) {
-            super(fm);
-            this.mFragmentList = fragments;
-            this.mTabList = tabList;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return (mFragmentList == null || mFragmentList.size() == 0) ? null : mFragmentList.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList == null ? 0 : mFragmentList.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mTabList.get(position);
-        }
+    private View getIndicator(int position){
+        View rootVIew = getLayoutInflater().inflate(R.layout.item_tab_host,null);
+        TextView tv = (TextView)rootVIew.findViewById(R.id.item_tv);
+        ImageView iv = (ImageView)rootVIew.findViewById(R.id.item_iv);
+        tv.setText(arrModelName[position]);
+        iv.setImageResource(arrImgNormal[position]);
+        return rootVIew;
     }
 
     @Override
@@ -106,5 +101,21 @@ public class ImActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     *  切换tab颜色和图标
+     */
+    private void tabClick(int tabId , boolean isSelected){
+        View view = tabhost.getTabWidget().getChildTabViewAt(tabId);
+        TextView textView = ((TextView)view.findViewById(R.id.item_tv));
+        ImageView imageView = ((ImageView)view.findViewById(R.id.item_iv));
+        if (isSelected){
+            textView.setTextColor(getResources().getColor(R.color.text_selected));
+            imageView.setImageResource(arrImgPressed[tabId]);
+        }else {
+            textView.setTextColor(getResources().getColor(R.color.text_dark));
+            imageView.setImageResource(arrImgNormal[tabId]);
+        }
     }
 }

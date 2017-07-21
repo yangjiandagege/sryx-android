@@ -8,7 +8,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.yj.sryx.view.im.SearchFriendActivity">
-
+    <com.yj.sryx.widget.AcceBar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:toolbarTitle="添加联系人"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

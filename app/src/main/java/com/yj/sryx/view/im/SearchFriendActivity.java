@@ -59,7 +59,7 @@ public class SearchFriendActivity extends AppCompatActivity {
                     holder.setImageResource(R.id.iv_header, R.mipmap.header_pic);
                 }
                 holder.setText(R.id.tv_name, contact.getName());
-                holder.setText(R.id.tv_info, contact.getSex()+" "+contact.getProvince()+" "+contact.getCity());
+                holder.setText(R.id.tv_info, contact.getSex());
                 holder.setOnClickListener(R.id.tv_add_friend, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
