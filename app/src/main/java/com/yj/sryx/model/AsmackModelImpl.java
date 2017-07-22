@@ -278,6 +278,38 @@ public class AsmackModelImpl implements AsmackModel {
         .subscribe(new ProgressSubscriber(callback, mContext));
     }
 
+    @Override
+    public void isMyFriend(final String playerId, SubscriberOnNextListener<Boolean> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                try {
+                    Boolean isMyFriend = false;
+                    Collection<RosterEntry> rosterEntry = connection.getRoster().getEntries();
+                    Iterator<RosterEntry> i = rosterEntry.iterator();
+                    while (i.hasNext()) {
+                        RosterEntry entry = i.next();
+                        LogUtils.logout(entry.getUser()+" "+entry.getName()+" "+entry.getStatus()+" "+entry.getType());
+                        if(entry.getUser().contains(playerId)){
+                            isMyFriend = true;
+                        }
+                    }
+
+                    subscriber.onNext(isMyFriend);
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
 
     private static ConnectionListener mConnectionListener = new ConnectionListener() {
 

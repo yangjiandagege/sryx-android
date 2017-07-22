@@ -25,4 +25,5 @@ public interface AsmackModel {
     void getVCard(String jid, SubscriberOnNextListener<VCard> callback);
     void sendMessage(String sessionJID, String sessionName, String message, MessageListener listener, SubscriberOnNextListener<Integer> callback);
     void getOfflineMessages(SubscriberOnNextListener<List<Message>> callback);
+    void isMyFriend(String playId, SubscriberOnNextListener<Boolean> callback);
 }

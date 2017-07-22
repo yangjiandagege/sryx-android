@@ -47,48 +47,48 @@ public class NewFriendsActivity extends BaseActivity {
         setContentView(R.layout.activity_new_friends);
         ButterKnife.bind(this);
         mAsmackModel = new AsmackModelImpl(this);
-        initLayout();
-        loadData();
+//        initLayout();
+//        loadData();
     }
 
     private void initLayout() {
-        mContactList = new ArrayList<>();
-        rvListFriend.addItemDecoration(new RecycleViewDivider(this, LinearLayoutManager.HORIZONTAL));
-        mAdapter = new CommonAdapter<RosterEntry>(this, R.layout.item_list_user_search, mContactList) {
-            @Override
-            protected void convert(final ViewHolder holder, final RosterEntry entry, int position) {
-                mAsmackModel.getVCard(entry.getUser(), new SubscriberOnNextListener<VCard>() {
-                    @Override
-                    public void onSuccess(final VCard vCard) {
-                        holder.setText(R.id.tv_name, vCard.getNickName());
-                        holder.setImageDrawable(R.id.iv_header, FormatTools.getInstance().InputStream2Drawable(new ByteArrayInputStream(vCard.getAvatar())));
-                        holder.setText(R.id.tv_info, vCard.getField("sex"));
-                        holder.setText(R.id.tv_add_friend, "接受请求");
-                        holder.setOnClickListener(R.id.tv_add_friend, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                mAsmackModel.addFriend(entry.getUser(), vCard.getNickName(), new SubscriberOnNextListener<Integer>() {
-                                    @Override
-                                    public void onSuccess(Integer integer) {
-                                        holder.setText(R.id.tv_add_friend, "已添加");
-                                    }
-
-                                    @Override
-                                    public void onError(String msg) {
-
-                                    }
-                                });
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(String msg) {
-                    }
-                });
-            }
-        };
-        rvListFriend.setAdapter(mAdapter);
+//        mContactList = new ArrayList<>();
+//        rvListFriend.addItemDecoration(new RecycleViewDivider(this, LinearLayoutManager.HORIZONTAL));
+//        mAdapter = new CommonAdapter<RosterEntry>(this, R.layout.item_list_user_search, mContactList) {
+//            @Override
+//            protected void convert(final ViewHolder holder, final RosterEntry entry, int position) {
+//                mAsmackModel.getVCard(entry.getUser(), new SubscriberOnNextListener<VCard>() {
+//                    @Override
+//                    public void onSuccess(final VCard vCard) {
+//                        holder.setText(R.id.tv_name, vCard.getNickName());
+//                        holder.setImageDrawable(R.id.iv_header, FormatTools.getInstance().InputStream2Drawable(new ByteArrayInputStream(vCard.getAvatar())));
+//                        holder.setText(R.id.tv_info, vCard.getField("sex"));
+//                        holder.setText(R.id.tv_add_friend, "接受请求");
+//                        holder.setOnClickListener(R.id.tv_add_friend, new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                mAsmackModel.addFriend(entry.getUser(), vCard.getNickName(), new SubscriberOnNextListener<Integer>() {
+//                                    @Override
+//                                    public void onSuccess(Integer integer) {
+//                                        holder.setText(R.id.tv_add_friend, "已添加");
+//                                    }
+//
+//                                    @Override
+//                                    public void onError(String msg) {
+//
+//                                    }
+//                                });
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onError(String msg) {
+//                    }
+//                });
+//            }
+//        };
+//        rvListFriend.setAdapter(mAdapter);
     }
 
     private void loadData() {

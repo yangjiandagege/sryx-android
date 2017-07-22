@@ -21,6 +21,7 @@ import com.flyco.animation.SlideExit.SlideBottomExit;
 import com.flyco.dialog.listener.OnBtnClickL;
 import com.flyco.dialog.widget.NormalDialog;
 import com.yj.sryx.R;
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.SryxConfig;
 import com.yj.sryx.common.RecycleViewDivider;
 import com.yj.sryx.manager.RxBus;
@@ -199,6 +200,14 @@ public class PrepareGameActivity extends BaseActivity {
                 } else {
                     holder.setText(R.id.tv_nickname, "未连接");
                 }
+                holder.setOnClickListener(R.id.iv_header, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(PrepareGameActivity.this, PlayerInfoActivity.class);
+                        intent.putExtra(PlayerInfoActivity.EXTRAS_PLAYER_ID, role.getPlayerId());
+                        startActivity(intent);
+                    }
+                });
             }
         };
         rvGridRoles.setAdapter(mAdapter);

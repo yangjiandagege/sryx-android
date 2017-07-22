@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,6 +13,8 @@ import com.bumptech.glide.Glide;
 import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.AsmackModel;
+import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Player;
@@ -35,26 +38,32 @@ public class PlayerInfoActivity extends BaseActivity {
     TextView tvName;
     @Bind(R.id.tv_info)
     TextView tvInfo;
+    @Bind(R.id.btn_attention)
+    Button btnAttention;
 
     private String mPlayerId;
     private SryxModel mSryxModel;
+    private AsmackModel mAsmackModel;
+    private Player mPlayer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player_info);
         setSupportActionBar(acceToolbar);
         ButterKnife.bind(this);
-        if(null != getIntent().getExtras()){
+        if (null != getIntent().getExtras()) {
             mPlayerId = getIntent().getExtras().getString(EXTRAS_PLAYER_ID);
             mSryxModel = new SryxModelImpl(this);
             mSryxModel.getPlayerById(mPlayerId, new SubscriberOnNextListener<Player>() {
                 @Override
                 public void onSuccess(Player player) {
+                    mPlayer = player;
                     Glide.with(PlayerInfoActivity.this)
                             .load(player.getAvatarUrl())
                             .into(ivHeader);
                     tvName.setText(player.getNickName());
-                    tvInfo.setText(player.getGender()==0?"女":"男"+" "+player.getProvince()+" "+player.getCity());
+                    tvInfo.setText(player.getGender() == 0 ? "女" : "男" + " " + player.getProvince() + " " + player.getCity());
                     initImmersive();
                 }
 
@@ -63,6 +72,42 @@ public class PlayerInfoActivity extends BaseActivity {
 
                 }
             });
+
+            if (mPlayerId.equals(SryxApp.sWxUser.getOpenid())) {
+                btnAttention.setVisibility(View.INVISIBLE);
+            } else {
+                mAsmackModel = new AsmackModelImpl(this);
+                mAsmackModel.isMyFriend(mPlayerId, new SubscriberOnNextListener<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+                        if (aBoolean) {
+                            btnAttention.setText("取消关注");
+                        } else {
+                            btnAttention.setText("点我关注");
+                            btnAttention.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mAsmackModel.addFriend(mPlayerId + "@39.108.82.35", mPlayer.getNickName(), new SubscriberOnNextListener<Integer>() {
+                                        @Override
+                                        public void onSuccess(Integer integer) {
+                                            btnAttention.setText("取消关注");
+                                        }
+
+                                        @Override
+                                        public void onError(String msg) {
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+
+                    }
+                });
+            }
         }
     }
 

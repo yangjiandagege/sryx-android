@@ -60,7 +60,7 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnItem
         mActivity = getActivity();
         mAsmackModel = new AsmackModelImpl(mActivity);
         mContactList = new ArrayList<>();
-        mContactList.add((Contact)new Contact("新的朋友", "新的朋友", true).setBaseIndexTag(INDEX_STRING_TOP));
+//        mContactList.add((Contact)new Contact("新的朋友", "新的朋友", true).setBaseIndexTag(INDEX_STRING_TOP));
         mContactList.add((Contact)new Contact("群聊", "群聊", true).setBaseIndexTag(INDEX_STRING_TOP));
         initLayout();
         getAllEntries();
@@ -73,9 +73,7 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnItem
             public void onSuccess(List<RosterEntry> rosterEntries) {
                 for (int i = 0; i < rosterEntries.size(); i++) {
                     Contact contact = new Contact(rosterEntries.get(i).getUser(), rosterEntries.get(i).getName(), false);
-                    if(rosterEntries.get(i).getType() == RosterPacket.ItemType.both) {
-                        mContactList.add(contact);
-                    }
+                    mContactList.add(contact);
                 }
 
                 indexBar.setmSourceDatas(mContactList)//设置数据

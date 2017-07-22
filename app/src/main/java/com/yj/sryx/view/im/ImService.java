@@ -145,7 +145,7 @@ public class ImService extends Service {
                         }
                         if (presence.getType().equals(Presence.Type.subscribe)) {
                             LogUtils.logout("收到添加请求！");
-                            sendAddFriendApplyNotification();
+//                            sendAddFriendApplyNotification();
                         } else if (presence.getType().equals(Presence.Type.subscribed)) {
                             LogUtils.logout("恭喜，对方同意添加好友！");
                         } else if (presence.getType().equals(Presence.Type.unsubscribe)) {
@@ -187,22 +187,21 @@ public class ImService extends Service {
                         chatMessage.setIsSendOk(true);
                         chatMessage.setIsRead(false);
                         mChatMessageDao.insert(chatMessage);
-
+                        VCard vCard = new VCard();
+                        try {
+                            vCard.load(mConnection, fromUser);
+                        } catch (SmackException.NoResponseException | SmackException.NotConnectedException | XMPPException.XMPPErrorException e) {
+                            e.printStackTrace();
+                        }
                         ChatSession chatSession = mChatSessionDao.load(fromUser);
                         if(null == chatSession){
                             chatSession = new ChatSession();
                             chatSession.setSessionId(fromUser);
-                            VCard vCard = new VCard();
-                            try {
-                                vCard.load(mConnection, fromUser);
-                                chatSession.setSessionName(vCard.getNickName());
-                                chatSession.setLastTime(System.currentTimeMillis());
-                                chatSession.setLastBody(message.getBody());
-                                chatSession.setUnreadCount(1);
-                                mChatSessionDao.insert(chatSession);
-                            } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
-                                e.printStackTrace();
-                            }
+                            chatSession.setSessionName(vCard.getNickName());
+                            chatSession.setLastTime(System.currentTimeMillis());
+                            chatSession.setLastBody(message.getBody());
+                            chatSession.setUnreadCount(1);
+                            mChatSessionDao.insert(chatSession);
                         }else {
                             chatSession.setLastTime(System.currentTimeMillis());
                             chatSession.setLastBody(message.getBody());
@@ -213,7 +212,7 @@ public class ImService extends Service {
                         if(ActivityUtils.isTopActivity(mContext, ChatActivity.class.getName()) && message.getFrom().contains(ChatActivity.OTHER_USER_ID)) {
                             RxBus.getInstance().post(chatMessage);
                         }else {
-                            sendTopMsgNotification();
+                            sendTopMsgNotification(fromUser, vCard.getNickName());
                         }
                     }
                 });
@@ -243,11 +242,14 @@ public class ImService extends Service {
         mNotiManager.notify(NOTIFICATION_ID_1, builder.build());
     }
 
-    private void sendTopMsgNotification() {
+    private void sendTopMsgNotification(String user, String name) {
+        Intent intent = new Intent(mContext, ChatActivity.class);
+        intent.putExtra(ChatActivity.EXTRA_NAME, name);
+        intent.putExtra(ChatActivity.EXTRA_USER, user);
         PendingIntent pi = PendingIntent.getActivity(
                 mContext,
                 100,
-                new Intent(mContext, MainActivity.class),
+                new Intent(mContext, ChatActivity.class),
                 PendingIntent.FLAG_CANCEL_CURRENT
         );
 

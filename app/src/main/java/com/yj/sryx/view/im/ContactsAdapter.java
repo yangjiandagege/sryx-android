@@ -27,8 +27,8 @@ import java.util.List;
  */
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> {
-    private final int NEW_FRIENDS_POS = 0;
-    private final int GROUP_CHAT_POS = 1;
+//    private final int NEW_FRIENDS_POS = 0;
+    private final int GROUP_CHAT_POS = 0;
 
     protected Context mContext;
     protected List<Contact> mDatas;
@@ -71,9 +71,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     public void onBindViewHolder(final ContactsAdapter.ViewHolder holder, final int position) {
         final Contact contact = mDatas.get(position);
         holder.tvName.setText(contact.getName());
-        if(position == NEW_FRIENDS_POS){
-            holder.ivHeader.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.new_friends));
-        }else if(position == GROUP_CHAT_POS){
+        if(position == GROUP_CHAT_POS){
             holder.ivHeader.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.chat_group));
         }else {
             mAsmackModel.getHeaderPic(contact.getUser(), new HeaderPicSetListener(position, holder.ivHeader));
@@ -83,9 +81,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
             public void onClick(View v) {
                 if(mOnItemClickListener != null){
                     switch (position){
-                        case NEW_FRIENDS_POS:
-                            mOnItemClickListener.OnNewFriendsClick();
-                            break;
+//                        case NEW_FRIENDS_POS:
+//                            mOnItemClickListener.OnNewFriendsClick();
+//                            break;
                         case GROUP_CHAT_POS:
                             mOnItemClickListener.OnGroupChatClick();
                             break;

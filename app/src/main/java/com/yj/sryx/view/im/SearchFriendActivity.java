@@ -1,5 +1,6 @@
 package com.yj.sryx.view.im;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.yj.sryx.R;
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.common.RecycleViewDivider;
 import com.yj.sryx.manager.XmppConnSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
@@ -15,6 +17,8 @@ import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.beans.SearchContact;
 import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.ToastUtils;
+import com.yj.sryx.view.game.MainActivity;
+import com.yj.sryx.view.game.PlayerInfoActivity;
 import com.yj.sryx.widget.SearchEditText;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
 import com.yj.sryx.widget.adapterrv.ViewHolder;
@@ -36,7 +40,6 @@ public class SearchFriendActivity extends AppCompatActivity {
     private AsmackModel mAsmackModel;
     private List<SearchContact> mContactList;
     private CommonAdapter<SearchContact> mAdapter;
-    private XMPPConnection mConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +47,6 @@ public class SearchFriendActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search_friend);
         ButterKnife.bind(this);
         mAsmackModel = new AsmackModelImpl(this);
-        mConnection = XmppConnSingleton.getInstance();
         initLayout();
     }
 
@@ -61,22 +63,12 @@ public class SearchFriendActivity extends AppCompatActivity {
                 }
                 holder.setText(R.id.tv_name, contact.getName());
                 holder.setText(R.id.tv_info, contact.getSex());
-                holder.setOnClickListener(R.id.tv_add_friend, new View.OnClickListener() {
+                holder.setOnClickListener(R.id.ll_contact, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        LogUtils.logout(contact.getName());
-                        mAsmackModel.addFriend(contact.getAccount(), contact.getName(), new SubscriberOnNextListener<Integer>() {
-                            @Override
-                            public void onSuccess(Integer integer) {
-                                ToastUtils.showLongToast(SearchFriendActivity.this, "发送添加好友申请成功！");
-                                holder.setText(R.id.tv_add_friend, "已发送申请");
-                            }
-
-                            @Override
-                            public void onError(String msg) {
-                                ToastUtils.showLongToast(SearchFriendActivity.this, "发送添加好友申请失败！");
-                            }
-                        });
+                        Intent intent = new Intent(SearchFriendActivity.this, PlayerInfoActivity.class);
+                        intent.putExtra(PlayerInfoActivity.EXTRAS_PLAYER_ID, contact.getAccount().split("@")[0]);
+                        startActivity(intent);
                     }
                 });
             }
