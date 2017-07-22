@@ -111,12 +111,12 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnItem
 
     @Override
     public void OnNewFriendsClick() {
-        startActivity(new Intent(mActivity, NewFriendsActivity.class));
+//        startActivity(new Intent(mActivity, NewFriendsActivity.class));
     }
 
     @Override
     public void OnGroupChatClick() {
-
+        startActivity(new Intent(mActivity, GroupChatListActivity.class));
     }
 
     @Override

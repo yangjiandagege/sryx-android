@@ -76,6 +76,7 @@ public class PrepareGameActivity extends BaseActivity {
     private CountDownTimerUtil mTimeCounter;
     private Game mGame;
     private List<WxUser> mWxUserListForTest = new ArrayList<>();
+    
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

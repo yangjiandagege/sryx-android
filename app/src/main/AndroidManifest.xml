@@ -223,7 +223,7 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".view.im.NewFriendsActivity"
+            android:name=".view.im.GroupChatListActivity"
             android:screenOrientation="portrait"/>
 
         <activity

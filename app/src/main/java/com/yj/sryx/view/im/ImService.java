@@ -275,7 +275,6 @@ public class ImService extends Service {
     private Runnable mTask =new Runnable() {
         public void run() {
             mHandler.postDelayed(this,3*1000);//设置延迟时间，此处是5秒
-            LogUtils.logout("asmack reconect...!");
             if(!mConnection.isConnected() || !mConnection.isAuthenticated()){
                 mOpenfireLoginModel.connectThenLogin(SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getOpenid(), SryxApp.sWxUser.getNickname(), new SubscriberOnNextListener<Integer>() {
                     @Override

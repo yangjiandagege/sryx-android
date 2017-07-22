@@ -21,11 +21,16 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.disco.packet.DiscoverItems;
+import org.jivesoftware.smackx.muc.HostedRoom;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.offline.OfflineMessageManager;
 import org.jivesoftware.smackx.search.ReportedData;
 import org.jivesoftware.smackx.search.UserSearchManager;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 import org.jivesoftware.smackx.xdata.Form;
+import org.jivesoftware.smackx.xdata.FormField;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -205,8 +210,6 @@ public class AsmackModelImpl implements AsmackModel {
         .subscribe(new ProgressSubscriber(callback, mContext, false));
     }
 
-
-
     @Override
     public void getVCard(final String jid, SubscriberOnNextListener<VCard> callback) {
         final XMPPConnection connection = XmppConnSingleton.getInstance();
@@ -310,45 +313,110 @@ public class AsmackModelImpl implements AsmackModel {
         .subscribe(new ProgressSubscriber(callback, mContext));
     }
 
+    @Override
+    public void createRoom(final String roomName, final String password, SubscriberOnNextListener<Integer> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                try {
+                    MultiUserChat muc = new MultiUserChat(connection, roomName + "@conference."
+                            + connection.getServiceName());
+                    // 创建聊天室
+                    muc.create(roomName);
+                    // 获得聊天室的配置表单
+                    Form form = muc.getConfigurationForm();
+                    // 根据原始表单创建一个要提交的新表单。
+                    Form submitForm = form.createAnswerForm();
+                    // 向要提交的表单添加默认答复
+                    List<FormField> fields = form.getFields();
+                    for (int i = 0; i < fields.size(); i++) {
+                        FormField field = fields.get(i);
+                        if (!FormField.TYPE_HIDDEN.equals(field.getType())
+                                && field.getVariable() != null) {
+                            // 设置默认值作为答复
+                            submitForm.setDefaultAnswer(field.getVariable());
+                        }
+                    }
+                    // 设置聊天室的新拥有者
+                    List<String> owners = new ArrayList<String>();
+                    owners.add(connection.getUser());// 用户JID
+                    submitForm.setAnswer("muc#roomconfig_roomowners", owners);
+                    // 设置聊天室是持久聊天室，即将要被保存下来
+                    submitForm.setAnswer("muc#roomconfig_persistentroom", true);
+                    // 房间仅对成员开放
+                    submitForm.setAnswer("muc#roomconfig_membersonly", false);
+                    // 允许占有者邀请其他人
+                    submitForm.setAnswer("muc#roomconfig_allowinvites", true);
+                    if (!password.equals("")) {
+                        // 进入是否需要密码
+                        submitForm.setAnswer("muc#roomconfig_passwordprotectedroom",
+                                true);
+                        // 设置进入密码
+                        submitForm.setAnswer("muc#roomconfig_roomsecret", password);
+                    }
+                    // 能够发现占有者真实 JID 的角色
+                    // submitForm.setAnswer("muc#roomconfig_whois", "anyone");
+                    // 登录房间对话
+                    submitForm.setAnswer("muc#roomconfig_enablelogging", true);
+                    // 仅允许注册的昵称登录
+                    submitForm.setAnswer("x-muc#roomconfig_reservednick", true);
+                    // 允许使用者修改昵称
+                    submitForm.setAnswer("x-muc#roomconfig_canchangenick", false);
+                    // 允许用户注册房间
+                    submitForm.setAnswer("x-muc#roomconfig_registration", false);
+                    // 发送已完成的表单（有默认值）到服务器来配置聊天室
+                    muc.sendConfigurationForm(submitForm);
 
-    private static ConnectionListener mConnectionListener = new ConnectionListener() {
+                    subscriber.onNext(0);
+                } catch (XMPPException | SmackException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
 
-        @Override
-        public void reconnectionSuccessful() {
-            Log.i("connection", "reconnectionSuccessful");
-        }
-
-        @Override
-        public void reconnectionFailed(Exception arg0) {
-            Log.i("connection", "reconnectionFailed");
-        }
-
-        @Override
-        public void reconnectingIn(int arg0) {
-            Log.i("connection", "reconnectingIn");
-        }
-
-        @Override
-        public void connected(XMPPConnection xmppConnection) {
-            Log.i("connection", "connected");
-        }
-
-        @Override
-        public void authenticated(XMPPConnection xmppConnection) {
-            Log.i("connection", "authenticated");
-        }
-
-        @Override
-        public void connectionClosed() {
-            Log.i("connection", "connectionClosed");
-        }
-
-        @Override
-        public void connectionClosedOnError(Exception arg0) {
-            Log.i("connection", "connectionClosedOnError");
-        }
-    };
-
+    @Override
+    public void getChatRooms(SubscriberOnNextListener<List<DiscoverItems.Item>> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<List<DiscoverItems.Item>>() {
+            @Override
+            public void call(Subscriber<? super List<DiscoverItems.Item>> subscriber) {
+                try {
+                    Collection<HostedRoom> hostrooms = MultiUserChat.getHostedRooms(connection,
+                            connection.getServiceName());
+                    String jid = null;
+                    List<DiscoverItems.Item> items = null;
+                    for (HostedRoom entry : hostrooms) {
+                        if(entry.getJid().contains("conference")){
+                            jid = entry.getJid();
+                        }
+                    }
+                    if(null != jid){
+                        // 获得与XMPPConnection相关的ServiceDiscoveryManager  
+                        ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
+                        DiscoverItems discoItems = discoManager.discoverItems(jid);
+                        items = discoItems.getItems();
+                    }
+                    subscriber.onNext(items);
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
 
     /**
      * Get image from newwork

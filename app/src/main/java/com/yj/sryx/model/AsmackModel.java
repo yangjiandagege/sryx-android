@@ -8,6 +8,8 @@ import com.yj.sryx.model.beans.SearchContact;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.disco.packet.DiscoverItems;
+import org.jivesoftware.smackx.muc.HostedRoom;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 
 import java.util.List;
@@ -26,4 +28,6 @@ public interface AsmackModel {
     void sendMessage(String sessionJID, String sessionName, String message, MessageListener listener, SubscriberOnNextListener<Integer> callback);
     void getOfflineMessages(SubscriberOnNextListener<List<Message>> callback);
     void isMyFriend(String playId, SubscriberOnNextListener<Boolean> callback);
+    void createRoom(String roomName, String password, SubscriberOnNextListener<Integer> callback);
+    void getChatRooms(SubscriberOnNextListener<List<DiscoverItems.Item>> callback);
 }
