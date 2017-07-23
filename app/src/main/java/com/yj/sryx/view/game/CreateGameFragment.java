@@ -12,6 +12,8 @@ import android.widget.Button;
 import com.yj.sryx.R;
 import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.AsmackModel;
+import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.WxUser;
@@ -38,6 +40,7 @@ public class CreateGameFragment extends Fragment {
     private QuizActivity mActivity;
 
     private SryxModel mSryxModel;
+    private AsmackModel mAsmackModel;
 
     @Nullable
     @Override
@@ -46,6 +49,7 @@ public class CreateGameFragment extends Fragment {
         ButterKnife.bind(this, view);
         mActivity = (QuizActivity) getActivity();
         mSryxModel = new SryxModelImpl(mActivity);
+        mAsmackModel = new AsmackModelImpl(mActivity);
         return view;
     }
 
@@ -67,11 +71,21 @@ public class CreateGameFragment extends Fragment {
                 avCitizenNum.getAmount(),
                 new SubscriberOnNextListener<String>() {
                     @Override
-                    public void onSuccess(String s) {
-                        mActivity.finish();
-                        Intent intent = new Intent(mActivity, PrepareGameActivity.class);
-                        intent.putExtra(PrepareGameActivity.KEY_GAME_ID, s);
-                        startActivity(intent);
+                    public void onSuccess(final String s) {
+                        mAsmackModel.createRoom(s, "wuhan123", new SubscriberOnNextListener<Integer>() {
+                            @Override
+                            public void onSuccess(Integer integer) {
+                                mActivity.finish();
+                                Intent intent = new Intent(mActivity, PrepareGameActivity.class);
+                                intent.putExtra(PrepareGameActivity.KEY_GAME_ID, s);
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public void onError(String msg) {
+
+                            }
+                        });
                     }
 
                     @Override

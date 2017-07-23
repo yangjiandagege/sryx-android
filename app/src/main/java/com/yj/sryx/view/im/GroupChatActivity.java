@@ -102,7 +102,7 @@ public class GroupChatActivity extends AppCompatActivity {
                 chatMessage.setBody(message.getBody().split("@&")[1]);
                 chatMessage.setTo(message.getTo());
                 chatMessage.setTime(System.currentTimeMillis());
-                LogUtils.logout(chatMessage.getFrom() +" " + chatMessage.getTo() + " : " + chatMessage.getBody());
+                LogUtils.logout(chatMessage.getFrom() + " " + chatMessage.getTo() + " : " + chatMessage.getBody());
                 mMsgList.add(chatMessage);
                 GroupChatActivity.this.runOnUiThread(new Runnable() {
                     @Override

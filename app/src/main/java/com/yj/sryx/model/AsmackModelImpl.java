@@ -352,11 +352,11 @@ public class AsmackModelImpl implements AsmackModel {
                     owners.add(connection.getUser());// 用户JID
                     submitForm.setAnswer("muc#roomconfig_roomowners", owners);
                     // 设置聊天室是持久聊天室，即将要被保存下来
-                    submitForm.setAnswer("muc#roomconfig_persistentroom", true);
+//                    submitForm.setAnswer("muc#roomconfig_persistentroom", true);
                     // 房间仅对成员开放
-                    submitForm.setAnswer("muc#roomconfig_membersonly", false);
+//                    submitForm.setAnswer("muc#roomconfig_membersonly", false);
                     // 允许占有者邀请其他人
-                    submitForm.setAnswer("muc#roomconfig_allowinvites", true);
+//                    submitForm.setAnswer("muc#roomconfig_allowinvites", true);
                     if (!password.equals("")) {
                         // 进入是否需要密码
                         submitForm.setAnswer("muc#roomconfig_passwordprotectedroom",
@@ -367,13 +367,13 @@ public class AsmackModelImpl implements AsmackModel {
                     // 能够发现占有者真实 JID 的角色
 //                    submitForm.setAnswer("muc#roomconfig_whois", "anyone");
                     // 登录房间对话
-                    submitForm.setAnswer("muc#roomconfig_enablelogging", true);
+//                    submitForm.setAnswer("muc#roomconfig_enablelogging", true);
                     // 仅允许注册的昵称登录
-                    submitForm.setAnswer("x-muc#roomconfig_reservednick", true);
+//                    submitForm.setAnswer("x-muc#roomconfig_reservednick", true);
                     // 允许使用者修改昵称
-                    submitForm.setAnswer("x-muc#roomconfig_canchangenick", false);
+//                    submitForm.setAnswer("x-muc#roomconfig_canchangenick", false);
                     // 允许用户注册房间
-                    submitForm.setAnswer("x-muc#roomconfig_registration", false);
+//                    submitForm.setAnswer("x-muc#roomconfig_registration", false);
                     // 发送已完成的表单（有默认值）到服务器来配置聊天室
                     muc.sendConfigurationForm(submitForm);
                     // 聊天室服务将会决定要接受的历史记录数量
@@ -503,11 +503,14 @@ public class AsmackModelImpl implements AsmackModel {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 try {
+                    LogUtils.logout(userJid+" "+roomJid+" "+" "+password);
                     MultiUserChat muc = new MultiUserChat(connection, roomJid);
-                    DiscussionHistory history = new DiscussionHistory();
-                    history.setMaxChars(0);
-                    muc.join(SryxApp.sWxUser.getNickname(), password, history,
-                            SmackConfiguration.getDefaultPacketReplyTimeout());
+                    if(!muc.isJoined()) {
+                        DiscussionHistory history = new DiscussionHistory();
+                        history.setMaxChars(0);
+                        muc.join(SryxApp.sWxUser.getNickname(), password, history,
+                                SmackConfiguration.getDefaultPacketReplyTimeout());
+                    }
                     muc.addMessageListener(listener);
                     subscriber.onNext(0);
                 } catch (SmackException | XMPPException.XMPPErrorException e) {

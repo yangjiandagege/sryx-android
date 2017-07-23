@@ -1,5 +1,6 @@
 package com.yj.sryx.view.game;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,6 +24,8 @@ import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.utils.CountDownTimerUtil;
 import com.yj.sryx.utils.TimeUtils;
 import com.yj.sryx.view.BaseActivity;
+import com.yj.sryx.view.im.GroupChatActivity;
+import com.yj.sryx.view.im.GroupChatListActivity;
 import com.yj.sryx.widget.AcceBar;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
 import com.yj.sryx.widget.adapterrv.ViewHolder;
@@ -63,6 +66,15 @@ public class GameManageActivity extends BaseActivity {
         mSryxModel = new SryxModelImpl(this);
         initLayout();
         getRolesInGame();
+        toolbar.setManagement("游戏聊天室", new AcceBar.OnManageListener() {
+            @Override
+            public void OnManageClick() {
+                Intent intent = new Intent(GameManageActivity.this, GroupChatActivity.class);
+                intent.putExtra(GroupChatActivity.EXTRA_ROOM_JID, mGameId+"@conference.39.108.82.35");
+                intent.putExtra(GroupChatActivity.EXTRA_ROOM_NAME, ""+mGameId);
+                startActivity(intent);
+            }
+        });
     }
 
     private void initLayout() {

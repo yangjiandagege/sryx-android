@@ -26,6 +26,8 @@ import com.yj.sryx.SryxConfig;
 import com.yj.sryx.common.RecycleViewDivider;
 import com.yj.sryx.manager.RxBus;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.AsmackModel;
+import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Game;
@@ -71,6 +73,7 @@ public class PrepareGameActivity extends BaseActivity {
     Button btnStartGame;
     private List<Role> mRoleList;
     private SryxModel mSryxModel;
+    private AsmackModel mAsmackModel;
     private CommonAdapter mAdapter;
     private String mGameId;
     private CountDownTimerUtil mTimeCounter;
@@ -83,6 +86,7 @@ public class PrepareGameActivity extends BaseActivity {
         setContentView(R.layout.activity_prepare_game);
         ButterKnife.bind(this);
         mSryxModel = new SryxModelImpl(this);
+        mAsmackModel = new AsmackModelImpl(this);
         mRoleList = new ArrayList<>();
         initData();
         initLayout();

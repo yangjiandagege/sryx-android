@@ -1,5 +1,6 @@
 package com.yj.sryx.view.game;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +16,10 @@ import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
 import com.yj.sryx.model.beans.Role;
+import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.view.BaseActivity;
+import com.yj.sryx.view.im.GroupChatActivity;
+import com.yj.sryx.widget.AcceBar;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,8 +31,8 @@ public class MyRoleActivity extends BaseActivity {
     TextView tvRoleName;
     @Bind(R.id.iv_press_back)
     ImageView ivPressBack;
-    @Bind(R.id.acce_toolbar)
-    Toolbar acceToolbar;
+    @Bind(R.id.toolbar)
+    AcceBar toolbar;
     private SryxModel mSryxModel;
     public static final String GAME_CODE = "game_code";
 
@@ -37,12 +41,12 @@ public class MyRoleActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_role);
         String gameCode = getIntent().getExtras().getString(GAME_CODE);
-        setSupportActionBar(acceToolbar);
         ButterKnife.bind(this);
         mSryxModel = new SryxModelImpl(this);
+        LogUtils.logout(SryxApp.sWxUser.getOpenid());
         mSryxModel.getRoleByCode(gameCode, SryxApp.sWxUser.getOpenid(), new SubscriberOnNextListener<Role>() {
             @Override
-            public void onSuccess(Role role) {
+            public void onSuccess(final Role role) {
                 switch (role.getRoleType()) {
                     case 0:
                         Glide.with(MyRoleActivity.this)
@@ -63,6 +67,16 @@ public class MyRoleActivity extends BaseActivity {
                         tvRoleName.setText("平民");
                         break;
                 }
+
+                toolbar.setManagement("游戏聊天室", new AcceBar.OnManageListener() {
+                    @Override
+                    public void OnManageClick() {
+                        Intent intent = new Intent(MyRoleActivity.this, GroupChatActivity.class);
+                        intent.putExtra(GroupChatActivity.EXTRA_ROOM_JID, role.getGameId()+"@conference.39.108.82.35");
+                        intent.putExtra(GroupChatActivity.EXTRA_ROOM_NAME, ""+role.getGameId());
+                        startActivity(intent);
+                    }
+                });
             }
 
             @Override
@@ -70,6 +84,7 @@ public class MyRoleActivity extends BaseActivity {
             }
         });
         initImmersive();
+
     }
 
     private void initImmersive(){
@@ -82,7 +97,7 @@ public class MyRoleActivity extends BaseActivity {
             getWindow().setNavigationBarColor(Color.TRANSPARENT);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-        acceToolbar.setBackgroundColor(Color.TRANSPARENT);
+        toolbar.setBackgroundColor(Color.TRANSPARENT);
     }
 
 
