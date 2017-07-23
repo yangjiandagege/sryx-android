@@ -15,11 +15,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yj.sryx.R;
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.common.DividerItemDecoration;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.AsmackModel;
 import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.beans.Contact;
+import com.yj.sryx.view.game.MainActivity;
+import com.yj.sryx.view.game.PlayerInfoActivity;
 import com.yj.sryx.widget.indexlib.IndexBar.widget.IndexBar;
 import com.yj.sryx.widget.indexlib.suspension.SuspensionDecoration;
 
@@ -60,8 +63,7 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnItem
         mActivity = getActivity();
         mAsmackModel = new AsmackModelImpl(mActivity);
         mContactList = new ArrayList<>();
-//        mContactList.add((Contact)new Contact("新的朋友", "新的朋友", true).setBaseIndexTag(INDEX_STRING_TOP));
-        mContactList.add((Contact)new Contact("群聊", "群聊", true).setBaseIndexTag(INDEX_STRING_TOP));
+        mContactList.add((Contact)new Contact("聊天室", "聊天室", true).setBaseIndexTag(INDEX_STRING_TOP));
         initLayout();
         getAllEntries();
         return view;
@@ -110,8 +112,10 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnItem
     }
 
     @Override
-    public void OnNewFriendsClick() {
-//        startActivity(new Intent(mActivity, NewFriendsActivity.class));
+    public void OnItemHeaderClick(int position) {
+        Intent intent = new Intent(mActivity, PlayerInfoActivity.class);
+        intent.putExtra(PlayerInfoActivity.EXTRAS_PLAYER_ID, mContactList.get(position).getUser().split("@")[0]);
+        startActivity(intent);
     }
 
     @Override
@@ -126,4 +130,6 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnItem
         intent.putExtra(ChatActivity.EXTRA_NAME, mContactList.get(position).getName());
         startActivity(intent);
     }
+
+
 }

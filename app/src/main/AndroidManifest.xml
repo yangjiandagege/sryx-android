@@ -229,6 +229,18 @@
         <activity
             android:name=".view.game.PlayerInfoActivity"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.im.GroupChatActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.im.GroupMembersActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.im.GroupInfoActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -81,24 +81,11 @@ public class PlayerInfoActivity extends BaseActivity {
                     @Override
                     public void onSuccess(Boolean aBoolean) {
                         if (aBoolean) {
-                            btnAttention.setText("取消关注");
+                            btnAttention.setText("删除联系人");
+                            setRemoveContactListener();
                         } else {
-                            btnAttention.setText("点我关注");
-                            btnAttention.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    mAsmackModel.addFriend(mPlayerId + "@39.108.82.35", mPlayer.getNickName(), new SubscriberOnNextListener<Integer>() {
-                                        @Override
-                                        public void onSuccess(Integer integer) {
-                                            btnAttention.setText("取消关注");
-                                        }
-
-                                        @Override
-                                        public void onError(String msg) {
-                                        }
-                                    });
-                                }
-                            });
+                            btnAttention.setText("添加联系人");
+                            setAddContactLinstener();
                         }
                     }
 
@@ -109,6 +96,42 @@ public class PlayerInfoActivity extends BaseActivity {
                 });
             }
         }
+    }
+
+    private void setAddContactLinstener() {
+        btnAttention.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAsmackModel.addFriend(mPlayerId + "@39.108.82.35", mPlayer.getNickName(), new SubscriberOnNextListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        btnAttention.setText("删除联系人");
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                    }
+                });
+            }
+        });
+    }
+
+    private void setRemoveContactListener() {
+        btnAttention.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAsmackModel.removeFriend(mPlayerId + "@39.108.82.35", new SubscriberOnNextListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        btnAttention.setText("添加联系人");
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                    }
+                });
+            }
+        });
     }
 
     private void initImmersive() {

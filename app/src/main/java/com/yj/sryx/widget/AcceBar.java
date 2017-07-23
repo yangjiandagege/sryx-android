@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
@@ -16,9 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.yj.sryx.R;
-import com.yj.sryx.SryxApp;
-
-import static android.graphics.PorterDuff.Mode.SRC_IN;
 
 /**
  * Created by eason.yang on 2017/3/6.
@@ -44,7 +38,7 @@ public class AcceBar extends LinearLayout {
 
     private void findView(Context context, AttributeSet attrs) {
         View view;
-        view = View.inflate(context, R.layout.acce_toolbar_dark, this);
+        view = View.inflate(context, R.layout.acce_toolbar, this);
         mContext = context;
 
         ivPressBack = (ImageView) view.findViewById(R.id.iv_press_back);

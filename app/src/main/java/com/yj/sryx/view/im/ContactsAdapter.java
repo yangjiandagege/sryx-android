@@ -37,7 +37,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     private OnItemClickListener mOnItemClickListener;
 
     interface OnItemClickListener{
-        void OnNewFriendsClick();
+        void OnItemHeaderClick(int position);
         void OnGroupChatClick();
         void OnItemClick(int position);
     }
@@ -81,9 +81,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
             public void onClick(View v) {
                 if(mOnItemClickListener != null){
                     switch (position){
-//                        case NEW_FRIENDS_POS:
-//                            mOnItemClickListener.OnNewFriendsClick();
-//                            break;
                         case GROUP_CHAT_POS:
                             mOnItemClickListener.OnGroupChatClick();
                             break;
@@ -92,6 +89,14 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
                             break;
                     }
 
+                }
+            }
+        });
+        holder.ivHeader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(GROUP_CHAT_POS != position){
+                    mOnItemClickListener.OnItemHeaderClick(position);
                 }
             }
         });

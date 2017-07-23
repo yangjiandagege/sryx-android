@@ -9,7 +9,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:toolbarTitle="群聊"/>
+        app:toolbarTitle="聊天室"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_list_friend"

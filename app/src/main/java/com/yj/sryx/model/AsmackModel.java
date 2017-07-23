@@ -6,10 +6,13 @@ import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
 import com.yj.sryx.model.beans.SearchContact;
 
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems;
+import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.HostedRoom;
+import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 
 import java.util.List;
@@ -30,4 +33,9 @@ public interface AsmackModel {
     void isMyFriend(String playId, SubscriberOnNextListener<Boolean> callback);
     void createRoom(String roomName, String password, SubscriberOnNextListener<Integer> callback);
     void getChatRooms(SubscriberOnNextListener<List<DiscoverItems.Item>> callback);
+    void sendGroupMessage(String userJid, String roomJid, String content, SubscriberOnNextListener<Integer> callback);
+    void removeFriend(String account, SubscriberOnNextListener<Integer> callback);
+    void leaveGroup(String roomJid, SubscriberOnNextListener<Integer> callback);
+    void getMembersForGroup(String roomJid, SubscriberOnNextListener<List<Occupant>> callback);
+    void joinGroup(String userJid, String roomJid, String password, SubscriberOnNextListener<Integer> callback, PacketListener listener);
 }

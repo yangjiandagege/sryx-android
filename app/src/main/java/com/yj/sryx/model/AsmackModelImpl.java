@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.manager.XmppConnSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.ProgressSubscriber;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
@@ -15,16 +16,22 @@ import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems;
+import org.jivesoftware.smackx.muc.Affiliate;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.HostedRoom;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.offline.OfflineMessageManager;
 import org.jivesoftware.smackx.search.ReportedData;
 import org.jivesoftware.smackx.search.UserSearchManager;
@@ -45,6 +52,7 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -194,6 +202,7 @@ public class AsmackModelImpl implements AsmackModel {
             @Override
             public void call(Subscriber<? super Drawable> subscriber) {
                 try {
+                    LogUtils.logout(jid);
                     VCard vCard = new VCard();
                     vCard.load(connection, jid);
                     subscriber.onNext(FormatTools.getInstance().InputStream2Drawable(new ByteArrayInputStream(vCard.getAvatar())));
@@ -356,7 +365,7 @@ public class AsmackModelImpl implements AsmackModel {
                         submitForm.setAnswer("muc#roomconfig_roomsecret", password);
                     }
                     // 能够发现占有者真实 JID 的角色
-                    // submitForm.setAnswer("muc#roomconfig_whois", "anyone");
+//                    submitForm.setAnswer("muc#roomconfig_whois", "anyone");
                     // 登录房间对话
                     submitForm.setAnswer("muc#roomconfig_enablelogging", true);
                     // 仅允许注册的昵称登录
@@ -367,7 +376,7 @@ public class AsmackModelImpl implements AsmackModel {
                     submitForm.setAnswer("x-muc#roomconfig_registration", false);
                     // 发送已完成的表单（有默认值）到服务器来配置聊天室
                     muc.sendConfigurationForm(submitForm);
-
+                    // 聊天室服务将会决定要接受的历史记录数量
                     subscriber.onNext(0);
                 } catch (XMPPException | SmackException e) {
                     subscriber.onError(e);
@@ -394,6 +403,7 @@ public class AsmackModelImpl implements AsmackModel {
                     String jid = null;
                     List<DiscoverItems.Item> items = null;
                     for (HostedRoom entry : hostrooms) {
+                        LogUtils.logout(entry.getJid()+" "+entry.getName());
                         if(entry.getJid().contains("conference")){
                             jid = entry.getJid();
                         }
@@ -412,11 +422,138 @@ public class AsmackModelImpl implements AsmackModel {
                     subscriber.onCompleted();
                 }
             }
+        }).subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    @Override
+    public void sendGroupMessage(final String userJid, final String roomJid, final String content, SubscriberOnNextListener<Integer> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                try {
+                    MultiUserChat muc = new MultiUserChat(connection, roomJid);
+                    muc.sendMessage(userJid+"@&"+content);
+                    subscriber.onNext(0);
+                } catch (XMPPException | SmackException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+//        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    @Override
+    public void removeFriend(final String account, SubscriberOnNextListener<Integer> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                try {
+                    RosterEntry entry = connection.getRoster().getEntry(account);
+                    connection.getRoster().removeEntry(entry);
+                    subscriber.onNext(0);
+                } catch (XMPPException | SmackException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
         })
         .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
         .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
         .subscribe(new ProgressSubscriber(callback, mContext));
     }
+
+    @Override
+    public void leaveGroup(final String roomJid, SubscriberOnNextListener<Integer> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                try {
+                    MultiUserChat muc = new MultiUserChat(connection, roomJid);
+                    muc.destroy("des",roomJid);
+                    subscriber.onNext(0);
+                } catch (SmackException | XMPPException.XMPPErrorException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    @Override
+    public void joinGroup(final String userJid, final String roomJid, final String password, SubscriberOnNextListener<Integer> callback, final PacketListener listener) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                try {
+                    MultiUserChat muc = new MultiUserChat(connection, roomJid);
+                    DiscussionHistory history = new DiscussionHistory();
+                    history.setMaxChars(0);
+                    muc.join(SryxApp.sWxUser.getNickname(), password, history,
+                            SmackConfiguration.getDefaultPacketReplyTimeout());
+                    muc.addMessageListener(listener);
+                    subscriber.onNext(0);
+                } catch (SmackException | XMPPException.XMPPErrorException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
+    @Override
+    public void getMembersForGroup(final String roomJid, SubscriberOnNextListener<List<Occupant>> callback) {
+        final XMPPConnection connection = XmppConnSingleton.getInstance();
+        Observable.create(new Observable.OnSubscribe<List<Occupant>>() {
+            @Override
+            public void call(Subscriber<? super List<Occupant>> subscriber) {
+                try {
+                    LogUtils.logout(roomJid);
+                    List<Occupant> occupantList = new ArrayList<>();
+
+                    MultiUserChat muc = new MultiUserChat(connection, roomJid);
+                    Collection<Occupant> allList = muc.getModerators();
+                    allList.addAll(muc.getParticipants());
+                    Iterator<Occupant> it = allList.iterator();
+                    while (it.hasNext()){
+                        occupantList.add(it.next());
+                    }
+                    subscriber.onNext(occupantList);
+                } catch (SmackException | XMPPException.XMPPErrorException e) {
+                    subscriber.onError(e);
+                    e.printStackTrace();
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        })
+        .subscribeOn(Schedulers.io()) // 指定subscribe()发生在IO线程
+        .observeOn(AndroidSchedulers.mainThread()) // 指定Subscriber的回调发生在UI线程
+        .subscribe(new ProgressSubscriber(callback, mContext));
+    }
+
 
     /**
      * Get image from newwork

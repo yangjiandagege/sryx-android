@@ -7,27 +7,17 @@
     android:background="@color/color_white"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.yj.sryx.view.game.MyRoleActivity">
-    <LinearLayout
+    <ImageView
+        android:id="@+id/iv_up_bg"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <ImageView
-            android:id="@+id/iv_up_bg"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@mipmap/player_info_bg"/>
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"/>
-    </LinearLayout>
+        android:layout_height="450px"
+        android:background="@mipmap/group_info_bg"/>
     <com.yj.sryx.widget.CircleImageView
         android:id="@+id/iv_header"
         android:layout_width="200px"
         android:layout_height="200px"
-        android:layout_centerInParent="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="350px"/>
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
@@ -37,21 +27,28 @@
         android:layout_marginTop="20px"
         android:textSize="20sp"/>
 
-    <TextView
-        android:id="@+id/tv_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20px"
-        android:textSize="14sp"/>
-
     <com.yj.sryx.widget.AcceBar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32px"
         app:isBgTransparent="true"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_list_member"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20px"
+        android:layout_below="@+id/tv_name"
+        android:layout_above="@+id/btn_attention"
+        android:background="@color/color_white"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        android:transitionGroup="false"
+        app:layoutManager="android.support.v7.widget.GridLayoutManager"
+        app:spanCount="1"
+        tools:ignore="UnusedAttribute"/>
 
     <Button
         android:id="@+id/btn_attention"
@@ -63,6 +60,5 @@
         android:padding="32px"
         android:layout_margin="32px"
         android:background="@drawable/add_friend_bg"
-        android:textColor="@color/color_orange_800"
-        android:text="关注"/>
+        android:textColor="@color/color_orange_800"/>
 </RelativeLayout>

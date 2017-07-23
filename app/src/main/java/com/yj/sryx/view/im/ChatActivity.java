@@ -141,36 +141,37 @@ public class ChatActivity extends AppCompatActivity {
                 mAsmackModel.sendMessage(mOtherUser, mOtherName, content, null, new SubscriberOnNextListener<Integer>() {
                     @Override
                     public void onSuccess(Integer integer) {
-                        chatMessage.setFrom(mMeUser);
-                        chatMessage.setTo(mOtherUser);
-                        chatMessage.setBody(content);
-                        chatMessage.setTime(System.currentTimeMillis());
-                        chatMessage.setIsSendOk(true);
-                        chatMessage.setIsRead(true);
-                        mMsgList.add(chatMessage);
-                        mChatMessageDao.insert(chatMessage);
-
-                        ChatSession chatSession = mChatSessionDao.load(mOtherUser);
-                        if(null == chatSession){
-                            chatSession = new ChatSession();
-                            chatSession.setSessionId(mOtherUser);
-                            chatSession.setSessionName(mOtherName);
-                            chatSession.setLastTime(System.currentTimeMillis());
-                            chatSession.setLastBody(content);
-                            chatSession.setUnreadCount(1);
-                            mChatSessionDao.insert(chatSession);
-                        }else {
-                            chatSession.setLastTime(System.currentTimeMillis());
-                            chatSession.setLastBody(content);
-                            chatSession.setUnreadCount(chatSession.getUnreadCount()+1);
-                            mChatSessionDao.update(chatSession);
-                        }
                     }
 
                     @Override
                     public void onError(String msg) {
                     }
                 });
+                chatMessage.setFrom(mMeUser);
+                chatMessage.setTo(mOtherUser);
+                chatMessage.setBody(content);
+                chatMessage.setTime(System.currentTimeMillis());
+                chatMessage.setIsSendOk(true);
+                chatMessage.setIsRead(true);
+                mMsgList.add(chatMessage);
+                mChatMessageDao.insert(chatMessage);
+
+                ChatSession chatSession = mChatSessionDao.load(mOtherUser);
+                if(null == chatSession){
+                    chatSession = new ChatSession();
+                    chatSession.setSessionId(mOtherUser);
+                    chatSession.setSessionName(mOtherName);
+                    chatSession.setLastTime(System.currentTimeMillis());
+                    chatSession.setLastBody(content);
+                    chatSession.setUnreadCount(1);
+                    mChatSessionDao.insert(chatSession);
+                }else {
+                    chatSession.setLastTime(System.currentTimeMillis());
+                    chatSession.setLastBody(content);
+                    chatSession.setUnreadCount(chatSession.getUnreadCount()+1);
+                    mChatSessionDao.update(chatSession);
+                }
+
                 mAdapter.notifyItemInserted(mAdapter.getItemCount());
                 rvChat.smoothScrollToPosition(mAdapter.getItemCount());
                 edtMsgContent.setText(null);

@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      tools:context="com.jersuen.im.MainActivity">
+    
+    <item android:id="@+id/action_group_members"
+          android:icon="@mipmap/group_members"
+          app:showAsAction="always"
+          android:title="群成员" />
+</menu>
