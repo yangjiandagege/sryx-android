@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.squareup.leakcanary.LeakCanary;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.yj.sryx.common.Theme;
@@ -11,6 +12,7 @@ import com.yj.sryx.model.beans.DaoMaster;
 import com.yj.sryx.model.beans.DaoSession;
 import com.yj.sryx.model.beans.WxUser;
 import com.yj.sryx.view.game.CreateGameFragment;
+import com.yj.sryx.view.game.GameChatActivity;
 import com.yj.sryx.view.game.GameDetailActivity;
 import com.yj.sryx.view.game.GameManageActivity;
 import com.yj.sryx.view.game.GameRecordsFragment;
@@ -52,6 +54,13 @@ public class SryxApp extends Application {
         initThemeMap();
         //初始化greendao数据库
         setDatabase();
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
     }
 
     private void setDatabase() {
@@ -78,6 +87,7 @@ public class SryxApp extends Application {
         sActivityThemeMap.put(GameDetailActivity.class.getSimpleName(), Theme.spe);
 
         sActivityThemeMap.put(ImActivity.class.getSimpleName(), Theme.spe);
+        sActivityThemeMap.put(GameChatActivity.class.getSimpleName(), Theme.blue);
     }
 
     private void initJpush() {

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
-              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <com.yj.sryx.widget.AcceBar
@@ -14,6 +13,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
         android:orientation="vertical"
         android:background="@drawable/game_manage_gradlient_bg">
         <RelativeLayout
@@ -80,4 +80,43 @@
                 tools:ignore="UnusedAttribute"/>
         </RelativeLayout>
     </LinearLayout>
-</LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="200px"
+        android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/rl_input"
+        android:clickable="false"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_white"
+        android:layout_alignParentBottom="true">
+        <EditText
+            android:id="@+id/edt_msg_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/btn_send_msg"
+            android:layout_centerVertical="true"
+            android:padding="32px"
+            android:textSize="14sp"
+            android:background="@android:color/transparent"
+            android:hint="请输入消息内容..."/>
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:id="@+id/btn_send_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent"
+            android:textColor="@color/text_selected"
+            android:layout_marginRight="16dp"
+            android:textSize="18sp"
+            android:text="发送"/>
+    </RelativeLayout>
+</RelativeLayout>

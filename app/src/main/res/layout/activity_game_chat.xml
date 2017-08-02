@@ -2,15 +2,17 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_chat"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.yj.sryx.view.game.MyRoleActivity">
+    tools:context="com.yj.sryx.view.im.ChatActivity">
 
     <ImageView
         android:id="@+id/iv_role"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
     <TextView
         android:id="@+id/tv_role_name"
         android:layout_width="wrap_content"
@@ -20,18 +22,24 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="120px"
         android:textSize="24sp"/>
-    <com.yj.sryx.widget.AcceBar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:isBgTransparent="true"/>
 
+    <ScrollView
+        android:id="@+id/sv_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <com.yj.sryx.widget.AcceBar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:isBgTransparent="true"/>
+    </ScrollView>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/sv_toolbar"
         android:layout_above="@+id/rl_input"/>
 
     <RelativeLayout
@@ -50,7 +58,6 @@
             android:padding="32px"
             android:textSize="14sp"
             android:background="@android:color/transparent"
-            android:textColor="#606060"
             android:hint="请输入消息内容..."/>
         <Button
             style="?android:attr/buttonStyleSmall"

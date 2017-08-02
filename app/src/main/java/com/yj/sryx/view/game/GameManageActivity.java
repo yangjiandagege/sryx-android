@@ -1,13 +1,16 @@
 package com.yj.sryx.view.game;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.flyco.animation.BounceEnter.BounceTopEnter;
@@ -15,20 +18,28 @@ import com.flyco.animation.SlideExit.SlideBottomExit;
 import com.flyco.dialog.listener.OnBtnClickL;
 import com.flyco.dialog.widget.NormalDialog;
 import com.yj.sryx.R;
+import com.yj.sryx.SryxApp;
 import com.yj.sryx.common.GrayscaleTransformation;
 import com.yj.sryx.common.RecycleViewDivider;
+import com.yj.sryx.manager.XmppConnSingleton;
 import com.yj.sryx.manager.httpRequest.subscribers.SubscriberOnNextListener;
+import com.yj.sryx.model.AsmackModelImpl;
 import com.yj.sryx.model.SryxModel;
 import com.yj.sryx.model.SryxModelImpl;
+import com.yj.sryx.model.beans.ChatMessage;
 import com.yj.sryx.model.beans.Role;
 import com.yj.sryx.utils.CountDownTimerUtil;
+import com.yj.sryx.utils.LogUtils;
 import com.yj.sryx.utils.TimeUtils;
 import com.yj.sryx.view.BaseActivity;
-import com.yj.sryx.view.im.GroupChatActivity;
-import com.yj.sryx.view.im.GroupChatListActivity;
 import com.yj.sryx.widget.AcceBar;
 import com.yj.sryx.widget.adapterrv.CommonAdapter;
 import com.yj.sryx.widget.adapterrv.ViewHolder;
+
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +59,14 @@ public class GameManageActivity extends BaseActivity {
     RecyclerView rvListRolesEvil;
     @Bind(R.id.toolbar)
     AcceBar toolbar;
+    @Bind(R.id.rv_chat)
+    RecyclerView rvChat;
+    @Bind(R.id.edt_msg_content)
+    EditText edtMsgContent;
+    @Bind(R.id.btn_send_msg)
+    Button btnSendMsg;
+    @Bind(R.id.rl_input)
+    RelativeLayout rlInput;
     private int mGameId;
     private SryxModel mSryxModel;
     private List<Role> mRoleListEvil;
@@ -55,7 +74,11 @@ public class GameManageActivity extends BaseActivity {
     private CommonAdapter mEvilAdapter;
     private CommonAdapter mJusticeAdapter;
     private CountDownTimerUtil mTimeCounter;
+    private List<ChatMessage> mMsgList;
+    private GameChatAdapter mAdapter;
     private int mCounter;
+    private AsmackModelImpl mAsmackModel;
+    private String mMeUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,17 +87,12 @@ public class GameManageActivity extends BaseActivity {
         ButterKnife.bind(this);
         mGameId = getIntent().getExtras().getInt(KEY_GAME_ID);
         mSryxModel = new SryxModelImpl(this);
+        mAsmackModel = new AsmackModelImpl(this);
+        mMsgList = new ArrayList<>();
+        mMeUser = SryxApp.sWxUser.getOpenid() + "@" + XmppConnSingleton.getInstance().getServiceName();
         initLayout();
+        initListener(mGameId+"@conference.39.108.82.35");
         getRolesInGame();
-        toolbar.setManagement("游戏聊天室", new AcceBar.OnManageListener() {
-            @Override
-            public void OnManageClick() {
-                Intent intent = new Intent(GameManageActivity.this, GroupChatActivity.class);
-                intent.putExtra(GroupChatActivity.EXTRA_ROOM_JID, mGameId+"@conference.39.108.82.35");
-                intent.putExtra(GroupChatActivity.EXTRA_ROOM_NAME, ""+mGameId);
-                startActivity(intent);
-            }
-        });
     }
 
     private void initLayout() {
@@ -110,6 +128,55 @@ public class GameManageActivity extends BaseActivity {
             }
         };
         rvListRolesJustice.setAdapter(mJusticeAdapter);
+
+        mAdapter = new GameChatAdapter(this, mMsgList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        rvChat.setLayoutManager(layoutManager);
+        ((SimpleItemAnimator) rvChat.getItemAnimator()).setSupportsChangeAnimations(false);
+        rvChat.setAdapter(mAdapter);
+    }
+
+
+    private void initListener(final String roomJid) {
+        mAsmackModel.joinGroup(mMeUser, roomJid, "wuhan123", null, new PacketListener() {
+            @Override
+            public void processPacket(Packet packet) throws SmackException.NotConnectedException {
+                Message message = (Message) packet;
+                ChatMessage chatMessage = new ChatMessage();
+                chatMessage.setFrom(message.getBody().split("@&")[0]);
+                chatMessage.setBody(message.getBody().split("@&")[1]);
+                chatMessage.setTo(message.getTo());
+                chatMessage.setTime(System.currentTimeMillis());
+                LogUtils.logout(chatMessage.getFrom() + " " + chatMessage.getTo() + " : " + chatMessage.getBody());
+                mMsgList.add(chatMessage);
+                GameManageActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+
+        btnSendMsg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String content = edtMsgContent.getText().toString();
+                mAsmackModel.sendGroupMessage(mMeUser, roomJid, content, new SubscriberOnNextListener<Integer>() {
+                    @Override
+                    public void onSuccess(Integer integer) {
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                    }
+                });
+                mAdapter.notifyItemInserted(mAdapter.getItemCount());
+                rvChat.smoothScrollToPosition(mAdapter.getItemCount());
+                edtMsgContent.setText(null);
+            }
+        });
     }
 
     private void setRoleItemView(ViewHolder holder, Role role, int position) {
@@ -117,7 +184,7 @@ public class GameManageActivity extends BaseActivity {
         holder.setText(R.id.tv_role, role.getRoleName());
         holder.getView(R.id.iv_kill_out).setOnClickListener(new VoteOrKillClickListener(position, role));
         holder.getView(R.id.iv_vote_out).setOnClickListener(new VoteOrKillClickListener(position, role));
-        switch (role.getDeath()){
+        switch (role.getDeath()) {
             case 0:
                 holder.setTextColor(R.id.tv_nickname, getResources().getColor(R.color.color_grey_800));
                 holder.setTextColor(R.id.tv_role, getResources().getColor(R.color.color_grey_800));
@@ -145,9 +212,9 @@ public class GameManageActivity extends BaseActivity {
         setRoleHeaderPic(role, holder);
     }
 
-    private void setRoleHeaderPic(Role role, ViewHolder holder){
+    private void setRoleHeaderPic(Role role, ViewHolder holder) {
         if (role.getPlayerAvatarUrl() != null) {
-            switch (role.getDeath()){
+            switch (role.getDeath()) {
                 case 0:
                     Glide.with(GameManageActivity.this)
                             .load(role.getPlayerAvatarUrl())
@@ -168,18 +235,18 @@ public class GameManageActivity extends BaseActivity {
         }
     }
 
-    class VoteOrKillClickListener implements View.OnClickListener{
+    class VoteOrKillClickListener implements View.OnClickListener {
         private int mPosition;
         private Role mRole;
 
-        public VoteOrKillClickListener(int position, Role role){
+        public VoteOrKillClickListener(int position, Role role) {
             mPosition = position;
             mRole = role;
         }
 
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.iv_kill_out:
                     showKillOrVoteRoleDialog(0, mRole);
                     break;
@@ -193,10 +260,10 @@ public class GameManageActivity extends BaseActivity {
     private void showKillOrVoteRoleDialog(final int operateType, final Role role) {
         final NormalDialog dialog = new NormalDialog(this);
         String msgContent;
-        if(operateType == 0){
-            msgContent = "大人，您确定" + role.getPlayerNickName() + "("+role.getRoleName()+")已经被杀死了吗？";
-        }else {
-            msgContent = "大人，您确定" + role.getPlayerNickName() + "("+role.getRoleName()+")已经被大家公投出局了吗？";
+        if (operateType == 0) {
+            msgContent = "大人，您确定" + role.getPlayerNickName() + "(" + role.getRoleName() + ")已经被杀死了吗？";
+        } else {
+            msgContent = "大人，您确定" + role.getPlayerNickName() + "(" + role.getRoleName() + ")已经被大家公投出局了吗？";
         }
         dialog.content(msgContent)
                 .style(NormalDialog.STYLE_TWO)
@@ -218,10 +285,10 @@ public class GameManageActivity extends BaseActivity {
                 new OnBtnClickL() {
                     @Override
                     public void onBtnClick() {
-                        mSryxModel.setRoleOut(operateType == 0?1:2, role.getRoleId(), role.getGameId(), new SubscriberOnNextListener<String>() {
+                        mSryxModel.setRoleOut(operateType == 0 ? 1 : 2, role.getRoleId(), role.getGameId(), new SubscriberOnNextListener<String>() {
                             @Override
                             public void onSuccess(String s) {
-                                if(!s.equals("continue")){
+                                if (!s.equals("continue")) {
                                     showResultDailog(s);
                                 }
                                 getRolesInGame();
@@ -238,7 +305,7 @@ public class GameManageActivity extends BaseActivity {
 
     private void showResultDailog(String result) {
         String resultContent = null;
-        switch (result){
+        switch (result) {
             case "0":
                 resultContent = "警察全部死亡，杀手集团获得胜利！";
                 break;

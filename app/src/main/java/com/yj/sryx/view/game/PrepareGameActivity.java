@@ -116,9 +116,11 @@ public class PrepareGameActivity extends BaseActivity {
                 LogUtils.logout("received : "+s);
                 switch (s){
                     case "0":
+                        LogUtils.logout("");
                         getRolesInGame();
                         break;
                     case "1":
+                        LogUtils.logout("");
                         getRolesInGame();
                         mTimeCounter.cancel();
                         btnStartGame.setText("开始游戏");
@@ -126,6 +128,8 @@ public class PrepareGameActivity extends BaseActivity {
                         btnStartGame.setAlpha(1);
                         break;
                     default:
+                        LogUtils.logout("");
+                        getRolesInGame();
                         break;
                 }
             }
