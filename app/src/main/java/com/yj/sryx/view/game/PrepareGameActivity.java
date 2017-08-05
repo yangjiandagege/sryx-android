@@ -94,18 +94,18 @@ public class PrepareGameActivity extends BaseActivity {
     }
 
     private void initData() {
-        mWxUserListForTest.add(new WxUser("oNMwb0bDbMJyl84q5jAddjyBexmA",
-                "我是MT",
-                "http://wx.qlogo.cn/mmopen/vi_32/hzgRzL39o1b1NVPlhfoFZqapqUNUvnlkKhcIshXkTkxDpJdHnh3LMz7g1eQbhUBnicx2mwndpduiazS39phM6ekg/0"));
-        mWxUserListForTest.add(new WxUser("oNMwb0dFoGQ7TvHJd7jbyFdmjgk4",
-                "被人追杀的eason",
-                "http://wx.qlogo.cn/mmopen/vi_32/GvzrAKyDiboTQJWicAKm5ejicUcMB9txkW9aApDBgvG8avfeA82p6b2ghskI02IJuC2RM1NdzvCAXaCHuACK6oAOQ/0"));
         mWxUserListForTest.add(new WxUser("oNMwb0YSPcT4vXxOjuO75xsbwOyo",
                 "边城浪子",
                 "http://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI9Nicr0ahll9C3nZibUzsKF1xdBelmT08N0PBT4HfY4BvmEjkjvgJx6BFwFFYqTV8rCKbHzydrKvibQ/0"));
         mWxUserListForTest.add(new WxUser("oNMwb0VrgsjHBw7I6dG64xBwJYuQ",
                 "习大喵子",
                 "http://wx.qlogo.cn/mmopen/vi_32/5YSF1tBkafDQGIIic9uUqsc3PwYUcoCQWNbD1rD3OlZmEYVSOBFG0UkYNibEUHyxh1icvmQOysqm1zVJdDFzeeUiag/0"));
+        mWxUserListForTest.add(new WxUser("oNMwb0bDbMJyl84q5jAddjyBexmA",
+                "我是MT",
+                "http://wx.qlogo.cn/mmopen/vi_32/hzgRzL39o1b1NVPlhfoFZqapqUNUvnlkKhcIshXkTkxDpJdHnh3LMz7g1eQbhUBnicx2mwndpduiazS39phM6ekg/0"));
+        mWxUserListForTest.add(new WxUser("oNMwb0dFoGQ7TvHJd7jbyFdmjgk4",
+                "被人追杀的eason",
+                "http://wx.qlogo.cn/mmopen/vi_32/GvzrAKyDiboTQJWicAKm5ejicUcMB9txkW9aApDBgvG8avfeA82p6b2ghskI02IJuC2RM1NdzvCAXaCHuACK6oAOQ/0"));
     }
 
     private void initRxbus() {
@@ -113,22 +113,14 @@ public class PrepareGameActivity extends BaseActivity {
         observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
             @Override
             public void call(String s) {
-                LogUtils.logout("received : "+s);
                 switch (s){
                     case "0":
-                        LogUtils.logout("");
                         getRolesInGame();
                         break;
                     case "1":
-                        LogUtils.logout("");
                         getRolesInGame();
-                        mTimeCounter.cancel();
-                        btnStartGame.setText("开始游戏");
-                        btnStartGame.setClickable(true);
-                        btnStartGame.setAlpha(1);
                         break;
                     default:
-                        LogUtils.logout("");
                         getRolesInGame();
                         break;
                 }
@@ -138,41 +130,28 @@ public class PrepareGameActivity extends BaseActivity {
 
     int counter = 0;
     private void initLayout() {
-        btnCancleGame.setOnLongClickListener(new View.OnLongClickListener() {
+        btnCancleGame.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-
-                new CountDownTimerUtil(mWxUserListForTest.size() * 1000, 1000) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        mSryxModel.joinGameByCode(mGame.getInviteCode(),
-                                mWxUserListForTest.get(counter).getOpenid(),
-                                mWxUserListForTest.get(counter).getNickname(),
-                                mWxUserListForTest.get(counter).getHeadimgurl(), null);
-                        counter ++;
-                        btnCancleGame.setClickable(false);
-                    }
-                    @Override
-                    public void onFinish() {
-                        mSryxModel.joinGameByCode(mGame.getInviteCode(),
-                                mWxUserListForTest.get(counter).getOpenid(),
-                                mWxUserListForTest.get(counter).getNickname(),
-                                mWxUserListForTest.get(counter).getHeadimgurl(), null);
-                        mTimeCounter.cancel();
-                        btnCancleGame.setClickable(true);
-                        counter = 0;
-                    }
-                }.start();
-                return true;
+            public void onClick(View v) {
+                mSryxModel.joinGameByCode(mGame.getInviteCode(),
+                        mWxUserListForTest.get(counter).getOpenid(),
+                        mWxUserListForTest.get(counter).getNickname(),
+                        mWxUserListForTest.get(counter).getHeadimgurl(), null);
+                counter ++;
             }
         });
+
         mGameId = (String) getIntent().getExtras().get(KEY_GAME_ID);
         mTimeCounter = new CountDownTimerUtil(120 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                btnStartGame.setText("等待中("+millisUntilFinished / 1000+"s)");
+                int scn = (int) (millisUntilFinished / 1000);
+                btnStartGame.setText("等待中("+scn+"s)");
                 btnStartGame.setClickable(false);
                 btnStartGame.setAlpha((float) 0.6);
+                if(scn % 3==0){
+                    getRolesInGame();
+                }
             }
             @Override
             public void onFinish() {
@@ -233,6 +212,18 @@ public class PrepareGameActivity extends BaseActivity {
                         lp.height = SizeUtils.dp2px(PrepareGameActivity.this, 330);
                         rvGridRoles.setLayoutParams(lp);
                         rvGridRoles.requestLayout();
+                    }
+                    boolean isFinish = true;
+                    for(int i = 0; i < roles.size(); i++){
+                        if(roles.get(i).getPlayerId() == null){
+                            isFinish = false;
+                        }
+                    }
+                    if(isFinish){
+                        mTimeCounter.cancel();
+                        btnStartGame.setText("开始游戏");
+                        btnStartGame.setClickable(true);
+                        btnStartGame.setAlpha(1);
                     }
                     mRoleList.clear();
                     mRoleList.addAll(roles);

@@ -66,7 +66,7 @@ public class SryxModelImpl implements SryxModel {
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ProgressSubscriber(callback, mContext));
+                .subscribe(new ProgressSubscriber(callback, mContext, false));
     }
 
     @Override

@@ -69,7 +69,7 @@
             android:padding="28px"
             android:background="@drawable/canclegame_btn"
             android:textColor="#909090"
-            android:text="取消游戏"/>
+            android:text="模拟玩家"/>
         <Button
             android:id="@+id/btn_start_game"
             android:layout_width="0px"
