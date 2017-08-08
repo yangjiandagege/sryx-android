@@ -83,7 +83,7 @@ public class ChatActivity extends AppCompatActivity {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         }
-
+        LogUtils.logout(""+mOtherUser+"  "+mOtherName);
         initData();
         initRxbus();
         initDrawable();

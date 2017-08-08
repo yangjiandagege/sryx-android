@@ -249,7 +249,7 @@ public class ImService extends Service {
         PendingIntent pi = PendingIntent.getActivity(
                 mContext,
                 100,
-                new Intent(mContext, ChatActivity.class),
+                intent,
                 PendingIntent.FLAG_CANCEL_CURRENT
         );
 
